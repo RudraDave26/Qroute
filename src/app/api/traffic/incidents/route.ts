@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   const maxLng = parseFloat(searchParams.get('maxLng') || '77.80');
 
   try {
-    const { incidents, status } = await fetchTomTomIncidents({
+    const { incidents, status, message } = await fetchTomTomIncidents({
       minLat,
       minLng,
       maxLat,
@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
       incidents,
       count: incidents.length,
       status,
+      message,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {

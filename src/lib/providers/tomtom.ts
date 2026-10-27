@@ -130,11 +130,13 @@ export async function fetchTomTomFlowSegment(lat: number, lng: number): Promise<
 
 export async function fetchTomTomIncidents(
   bbox: { minLat: number; minLng: number; maxLat: number; maxLng: number }
-): Promise<{ incidents: TrafficIncident[]; status: DataStatus }> {
+): Promise<{ incidents: TrafficIncident[]; status: DataStatus; message?: string }> {
   if (!TOMTOM_API_KEY) {
+    // Priority 1: Never fabricate live traffic or fake incidents
     return {
-      incidents: getSimulatedIncidents(bbox),
-      status: 'DEMO',
+      incidents: [],
+      status: 'UNAVAILABLE',
+      message: 'Live incident reporting requires an active TomTom Traffic API key in .env.local. No synthetic incidents are fabricated.',
     };
   }
 
@@ -142,7 +144,7 @@ export async function fetchTomTomIncidents(
     const url = `https://api.tomtom.com/traffic/services/5/incidentDetails?key=${TOMTOM_API_KEY}&bbox=${bbox.minLng},${bbox.minLat},${bbox.maxLng},${bbox.maxLat}&fields={incidents{type,geometry{type,coordinates},properties{iconCategory,magnitudeOfDelay,events{description,code},startTime,endTime,from,to,length}}}`;
     const res = await fetch(url);
     if (!res.ok) {
-      return { incidents: getSimulatedIncidents(bbox), status: 'DEMO' };
+      return { incidents: [], status: 'UNAVAILABLE', message: `TomTom API responded with status ${res.status}` };
     }
     const data = await res.json();
     const rawIncidents = data.incidents || [];
@@ -168,11 +170,12 @@ export async function fetchTomTomIncidents(
     });
 
     return {
-      incidents: mapped.length > 0 ? mapped : getSimulatedIncidents(bbox),
-      status: mapped.length > 0 ? 'LIVE' : 'DEMO',
+      incidents: mapped,
+      status: mapped.length > 0 ? 'LIVE' : 'LIVE',
+      message: mapped.length > 0 ? `${mapped.length} verified live incident(s) reported.` : 'No active verified incidents in selected area.',
     };
-  } catch (err) {
-    return { incidents: getSimulatedIncidents(bbox), status: 'DEMO' };
+  } catch (err: any) {
+    return { incidents: [], status: 'UNAVAILABLE', message: err.message || 'Network error fetching incidents' };
   }
 }
 
@@ -235,51 +238,4 @@ function getSimulatedTomTomRoute(origin: LatLng, destination: LatLng): TomTomRou
   };
 }
 
-function getSimulatedIncidents(bbox: { minLat: number; minLng: number; maxLat: number; maxLng: number }): TrafficIncident[] {
-  const midLat = (bbox.minLat + bbox.maxLat) / 2;
-  const midLng = (bbox.minLng + bbox.maxLng) / 2;
-  const spanLat = (bbox.maxLat - bbox.minLat) * 0.4;
-  const spanLng = (bbox.maxLng - bbox.minLng) * 0.4;
 
-  return [
-    {
-      id: 'inc-demo-1',
-      type: 'congestion',
-      severity: 'moderate',
-      description: 'Slow moving traffic due to high commuter volume',
-      location: { lat: midLat + spanLat * 0.3, lng: midLng - spanLng * 0.2 },
-      roadName: 'Main Arterial Bypass',
-      delaySeconds: 420,
-      lengthMeters: 1200,
-      verified: true,
-      startTime: new Date(Date.now() - 25 * 60000).toISOString(),
-      dataStatus: 'DEMO',
-    },
-    {
-      id: 'inc-demo-2',
-      type: 'construction',
-      severity: 'major',
-      description: 'Metro line pier expansion work; single lane operational',
-      location: { lat: midLat - spanLat * 0.2, lng: midLng + spanLng * 0.4 },
-      roadName: 'Ring Road Expressway Entry',
-      delaySeconds: 780,
-      lengthMeters: 850,
-      verified: true,
-      startTime: new Date(Date.now() - 3 * 3600000).toISOString(),
-      dataStatus: 'DEMO',
-    },
-    {
-      id: 'inc-demo-3',
-      type: 'accident',
-      severity: 'moderate',
-      description: 'Minor two-vehicle collision on shoulder; traffic slowing',
-      location: { lat: midLat + spanLat * 0.1, lng: midLng + spanLng * 0.1 },
-      roadName: 'Inner Circular Flyover',
-      delaySeconds: 300,
-      lengthMeters: 400,
-      verified: true,
-      startTime: new Date(Date.now() - 15 * 60000).toISOString(),
-      dataStatus: 'DEMO',
-    },
-  ];
-}

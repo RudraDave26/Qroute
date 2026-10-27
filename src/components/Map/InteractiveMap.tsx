@@ -265,9 +265,9 @@ export default function InteractiveMap({
         scrollWheelZoom={true}
         className="w-full h-full"
       >
-        {/* OpenStreetMap (OSM) Tile Layer */}
+        {/* OpenStreetMap (OSM) Tile Layer with Verified Attribution */}
         <TileLayer
-          attribution="&copy; QuantumRoute AI Geospatial Network"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors | QuantumRoute AI'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maxZoom={19}
         />
@@ -275,7 +275,7 @@ export default function InteractiveMap({
         {/* Optional Traffic Flow Raster Layer */}
         {showTrafficFlow && tomtomTrafficTileUrl && (
           <TileLayer
-            attribution="&copy; QuantumRoute AI Flow Telemetry"
+            attribution="&copy; TomTom Traffic Flow | QuantumRoute AI"
             url={tomtomTrafficTileUrl}
             maxZoom={19}
             opacity={0.65}

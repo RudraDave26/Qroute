@@ -582,6 +582,24 @@ export default function DashboardPage() {
             </div>
           )}
 
+          {/* Empty State */}
+          {!isLoadingRoutes && routes.length === 0 && (
+            <div className="p-6 text-center rounded-2xl bg-muted/30 border border-dashed border-border space-y-2">
+              <Navigation className="h-6 w-6 text-muted-foreground mx-auto" />
+              <p className="font-bold text-foreground text-sm">No Corridors Found</p>
+              <p className="text-xs text-muted-foreground">
+                Unable to route between the selected endpoints. Please check the locations and try again.
+              </p>
+              <button
+                type="button"
+                onClick={fetchRouteData}
+                className="mt-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
+              >
+                Retry Search
+              </button>
+            </div>
+          )}
+
           {/* Render Route Alternative Cards */}
           {!isLoadingRoutes &&
             routes.map((route) => (
