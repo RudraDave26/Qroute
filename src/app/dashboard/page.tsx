@@ -303,10 +303,10 @@ export default function DashboardPage() {
                 </div>
               )}
 
-              {/* Air Quality Chip (Open-Meteo Air Quality API) */}
+              {/* Air Quality Chip */}
               {airQuality && (
                 <div
-                  title={`Open-Meteo Air Quality: AQI ${airQuality.usAqi} (${airQuality.category}). PM2.5: ${airQuality.pm25} μg/m³`}
+                  title={`Air Quality Index: AQI ${airQuality.usAqi} (${airQuality.category}). PM2.5: ${airQuality.pm25} μg/m³`}
                   className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] border font-semibold ${
                     airQuality.usAqi <= 50
                       ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
@@ -332,24 +332,24 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* India Petroleum API live ticker banner */}
+          {/* Energy Tariffs live ticker banner */}
           {fuelInfo && (
             <div className="p-2 rounded-xl bg-slate-50 dark:bg-navy-900 border border-border flex items-center justify-between text-[11px]">
               <div className="flex items-center gap-1 text-slate-600 dark:text-slate-300">
                 <Fuel className="h-3 w-3 text-quantum-500" />
                 <span>
-                  PPAC Fuel: Petrol <strong>₹{fuelInfo.petrol}/L</strong> • Diesel <strong>₹{fuelInfo.diesel}/L</strong>
+                  Fuel Tariffs: Petrol <strong>₹{fuelInfo.petrol}/L</strong> • Diesel <strong>₹{fuelInfo.diesel}/L</strong>
                 </span>
               </div>
               <StatusBadge status={fuelInfo.isLive ? 'LIVE' : 'CACHED'} showIcon={false} className="py-0 px-1 text-[8px]" />
             </div>
           )}
 
-          {/* India Administrative Data indicator */}
+          {/* National Geographic Mesh indicator */}
           <div className="flex items-center justify-between px-1 text-[10px] text-muted-foreground">
             <span className="flex items-center gap-1.5">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>India Geodata: LGD & OpenAdmin (37 States, 635 Dist.)</span>
+              <span>National Routing Mesh: 37 States & 635 Districts</span>
             </span>
             <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold border border-emerald-500/20">
               ACTIVE
@@ -468,8 +468,8 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => {
-                const jaipur = { lat: 26.9124, lng: 75.7873, label: 'Jaipur, Rajasthan (LGD: 303088)' };
-                const delhi = { lat: 28.6139, lng: 77.2090, label: 'New Delhi (IN03)' };
+                const jaipur = { lat: 26.9124, lng: 75.7873, label: 'Jaipur, Rajasthan' };
+                const delhi = { lat: 28.6139, lng: 77.2090, label: 'New Delhi' };
                 setOrigin(jaipur);
                 setOriginQuery('Jaipur, Rajasthan');
                 setDestination(delhi);
@@ -557,7 +557,7 @@ export default function DashboardPage() {
                     onChange={(e) => setShowEVChargers(e.target.checked)}
                     className="rounded border-border text-emerald-500 focus:ring-emerald-500"
                   />
-                  <span>Show EV Chargers (Open Charge Map)</span>
+                  <span>Show EV Fast Charging Hubs</span>
                 </label>
               </div>
             </div>
@@ -692,7 +692,7 @@ export default function DashboardPage() {
                     ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-400'
                     : 'bg-muted text-muted-foreground'
                 }`}
-                title="Toggle Open Charge Map EV stations layer"
+                title="Toggle EV charging stations layer"
               >
                 <BatteryCharging className="h-3.5 w-3.5" />
                 <span>EV Hubs ({chargingStations.length})</span>
@@ -705,10 +705,10 @@ export default function DashboardPage() {
                     ? 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-400'
                     : 'bg-muted text-muted-foreground'
                 }`}
-                title="Toggle TomTom Traffic Flow Raster Tile Layer (TomTom Maps v1)"
+                title="Toggle Live Congestion Flow Overlay"
               >
                 <Wind className="h-3.5 w-3.5" />
-                <span>TomTom Flow v1</span>
+                <span>Traffic Flow Heatmap</span>
               </button>
             </div>
           </div>

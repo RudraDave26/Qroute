@@ -178,7 +178,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-base font-bold text-foreground">Choose Starting Point & Destination</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Type any city landmark or click your current location. We use OpenStreetMap to pinpoint your exact coordinates.
+                Type any city landmark or click your current location to pinpoint your exact coordinates.
               </p>
             </div>
 
@@ -224,7 +224,7 @@ export default function LandingPage() {
               <thead>
                 <tr className="border-b border-border bg-muted/60 text-foreground font-bold">
                   <th className="p-4">What you care about</th>
-                  <th className="p-4 text-muted-foreground">Standard Maps (Google Maps / OSM)</th>
+                  <th className="p-4 text-muted-foreground">Standard GPS Navigation Apps</th>
                   <th className="p-4 text-quantum-600 dark:text-quantum-400 font-extrabold">QuantumRoute AI</th>
                 </tr>
               </thead>

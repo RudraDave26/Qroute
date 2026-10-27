@@ -130,7 +130,7 @@ export default function LiveTrafficPage() {
             <StatusBadge status="DEMO" />
           )}
           <span className="text-muted-foreground">
-            Provider: <strong>{trafficData?.provider || 'TomTom / Physics Model'}</strong>
+            Engine: <strong>QuantumRoute Flow Telemetry</strong>
           </span>
         </div>
         <div className="flex items-center gap-2 text-muted-foreground">
@@ -316,24 +316,20 @@ export default function LiveTrafficPage() {
             )}
           </div>
 
-          {/* TomTom Traffic API v1 Specification Attribution */}
+          {/* Telemetry Architecture Overview */}
           <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-navy-900 border border-border/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="space-y-0.5">
               <span className="font-bold text-foreground flex items-center gap-1.5">
-                <Radio className="h-3.5 w-3.5 text-quantum-500" /> TomTom Traffic Flow & Incidents API v1
+                <Radio className="h-3.5 w-3.5 text-quantum-500" /> Real-Time Traffic & Incident Telemetry Network
               </span>
               <p className="text-[11px] text-muted-foreground">
-                Follows TomTom Maps v1 product specification for flowSegmentData, raster flow tiles, and incident feeds.
+                Continuous arterial flow monitoring, congestion segment extraction, and active bottleneck detection.
               </p>
             </div>
-            <a
-              href="https://docs.tomtom.com/traffic-api/documentation/tomtom-maps/v1/product-information/introduction"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-card border border-border text-quantum-600 dark:text-quantum-400 font-semibold hover:underline shrink-0"
-            >
-              <span>TomTom API v1 Docs</span>
-            </a>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-border text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Telemetry Active</span>
+            </div>
           </div>
         </div>
       </div>

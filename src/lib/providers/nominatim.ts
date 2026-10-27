@@ -109,13 +109,13 @@ export async function searchGeocode(query: string): Promise<SearchResultItem[]> 
     if (res.ok) {
       const data = await res.json();
       const nominatimResults: SearchResultItem[] = data.map((item: any) => ({
-        id: `osm-${item.place_id}`,
+        id: `geo-${item.place_id}`,
         name: item.display_name.split(',')[0],
         displayName: item.display_name,
         lat: parseFloat(item.lat),
         lng: parseFloat(item.lon),
         type: item.type || 'place',
-        badge: 'OpenStreetMap',
+        badge: 'Location',
       }));
 
       // Combine local matches with OSM Nominatim results

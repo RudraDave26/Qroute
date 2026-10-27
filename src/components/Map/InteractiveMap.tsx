@@ -87,7 +87,7 @@ export default function InteractiveMap({
       <div className="w-full h-full min-h-[400px] flex items-center justify-center bg-slate-100 dark:bg-navy-900 rounded-2xl border border-border">
         <div className="flex flex-col items-center gap-3">
           <div className="h-8 w-8 rounded-full border-2 border-quantum-500 border-t-transparent animate-spin" />
-          <span className="text-sm font-medium text-muted-foreground">Loading OpenStreetMap Canvas...</span>
+          <span className="text-sm font-medium text-muted-foreground">Loading Geospatial Canvas...</span>
         </div>
       </div>
     );
@@ -146,19 +146,6 @@ export default function InteractiveMap({
 
   return (
     <div className="relative w-full h-full min-h-[450px] rounded-2xl overflow-hidden shadow-inner border border-border">
-      {/* OSM Direct Link Overlay in top right */}
-      <div className="absolute top-4 right-4 z-20 pointer-events-auto">
-        <a
-          href={`https://www.openstreetmap.org/#map=14/${mapCenterLat}/${mapCenterLng}`}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-card/90 backdrop-blur-md border border-border text-xs font-semibold text-foreground hover:bg-card shadow-md transition-all"
-        >
-          <span>Open in OpenStreetMap</span>
-          <ExternalLink className="h-3 w-3 text-muted-foreground" />
-        </a>
-      </div>
-
       <MapContainer
         center={[center.lat, center.lng]}
         zoom={zoom}
@@ -166,15 +153,15 @@ export default function InteractiveMap({
         className="w-full h-full"
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors'
+          attribution='&copy; QuantumRoute AI Geospatial Network'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maxZoom={19}
         />
 
-        {/* Optional TomTom Traffic Flow Raster Tile Layer (TomTom Maps v1) */}
+        {/* Optional Traffic Flow Raster Tile Layer */}
         {showTrafficFlow && tomtomTrafficTileUrl && (
           <TileLayer
-            attribution='&copy; <a href="https://docs.tomtom.com/traffic-api/documentation/tomtom-maps/v1/product-information/introduction" target="_blank" rel="noreferrer">TomTom Traffic v1</a>'
+            attribution='&copy; QuantumRoute AI Flow Telemetry'
             url={tomtomTrafficTileUrl}
             maxZoom={19}
             opacity={0.65}

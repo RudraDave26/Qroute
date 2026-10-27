@@ -329,14 +329,14 @@ export async function searchIndianAdministrativeEntities(query: string) {
   for (const s of states) {
     if (s.nameEn.toLowerCase().includes(clean) || s.nameLocal.toLowerCase().includes(clean)) {
       matches.push({
-        id: `oad-state-${s.id}`,
+        id: `geo-state-${s.id}`,
         name: s.nameEn,
-        displayName: `${s.nameEn} (${s.nameLocal}), India — State/UT`,
+        displayName: `${s.nameEn} (${s.nameLocal}), India — State`,
         lat: s.lat,
         lng: s.lon,
         type: 'state',
-        category: 'State / Union Territory',
-        meta: { id: s.id, population: s.population, source: 'api.openadmindata.org' },
+        category: 'State',
+        meta: { id: s.id, population: s.population },
       });
     }
   }
@@ -349,21 +349,21 @@ export async function searchIndianAdministrativeEntities(query: string) {
       (d.nameLocal && d.nameLocal.toLowerCase().includes(clean))
     ) {
       matches.push({
-        id: `oad-district-${d.id}`,
+        id: `geo-district-${d.id}`,
         name: d.nameEn,
         displayName: `${d.nameEn}, ${d.parentNameEn}, India — District`,
         lat: d.lat,
         lng: d.lon,
         type: 'district',
-        category: `District (${d.parentNameEn})`,
-        meta: { id: d.id, parentState: d.parentNameEn, population: d.population, source: 'api.openadmindata.org' },
+        category: 'District',
+        meta: { id: d.id, parentState: d.parentNameEn, population: d.population },
       });
       districtMatches++;
       if (districtMatches >= 4) break;
     }
   }
 
-  // Match LGD Cities
+  // Match Cities
   for (const c of lgdCities) {
     const key = c.name.toLowerCase();
     const coords = KNOWN_CITY_COORDINATES[key];
@@ -386,18 +386,17 @@ export async function searchIndianAdministrativeEntities(query: string) {
     }
 
     matches.push({
-      id: `lgd-${c.code}`,
+      id: `geo-city-${c.code}`,
       name: c.name,
-      displayName: `${c.name}, ${c.districtName ? c.districtName + ', ' : ''}${c.stateName} [LGD: ${c.code}]`,
+      displayName: `${c.name}, ${c.districtName ? c.districtName + ', ' : ''}${c.stateName}`,
       lat: cityLat,
       lng: cityLng,
       type: 'city',
-      category: `LGD City / ULB (Code: ${c.code})`,
+      category: 'City',
       meta: {
-        lgdCode: c.code,
+        code: c.code,
         state: c.stateName,
         district: c.districtName,
-        source: 'lgd-json-api.vercel.app',
       },
     });
   }

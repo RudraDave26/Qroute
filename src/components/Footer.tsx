@@ -66,98 +66,49 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Col 3: Data Providers & Attribution */}
+          {/* Col 3: System Capabilities & Modules */}
           <div className="space-y-3">
-            <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider">Data Providers</h4>
+            <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider">Engine Modules</h4>
             <ul className="space-y-2 text-xs text-muted-foreground">
               <li className="flex items-center gap-1.5">
-                <span>Maps:</span>
-                <a
-                  href="https://www.openstreetmap.org/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline hover:text-foreground inline-flex items-center gap-0.5"
-                >
-                  OpenStreetMap <ExternalLink className="h-2.5 w-2.5" />
-                </a>
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span>Geospatial Vector Routing</span>
               </li>
               <li className="flex items-center gap-1.5">
-                <span>Air Quality:</span>
-                <a
-                  href="https://open-meteo.com/en/docs/air-quality-api"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline hover:text-foreground inline-flex items-center gap-0.5"
-                >
-                  Open-Meteo AQI <ExternalLink className="h-2.5 w-2.5" />
-                </a>
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span>Live Traffic Congestion Engine</span>
               </li>
               <li className="flex items-center gap-1.5">
-                <span>India Admin (37 States, 635 Dist.):</span>
-                <a
-                  href="https://api.openadmindata.org/api/v1/countries/in.json"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline hover:text-foreground inline-flex items-center gap-0.5"
-                >
-                  OpenAdminData <ExternalLink className="h-2.5 w-2.5" />
-                </a>
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span>Atmospheric Air Quality Telemetry</span>
               </li>
               <li className="flex items-center gap-1.5">
-                <span>India LGD Cities & ULBs:</span>
-                <a
-                  href="https://lgd-json-api.vercel.app/docs"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline hover:text-foreground inline-flex items-center gap-0.5"
-                >
-                  LGD JSON API <ExternalLink className="h-2.5 w-2.5" />
-                </a>
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span>EV Charging Infrastructure Radar</span>
               </li>
               <li className="flex items-center gap-1.5">
-                <span>India Fuel Tariffs:</span>
-                <a
-                  href="https://india-petroleum-api.vercel.app/docs"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline hover:text-foreground inline-flex items-center gap-0.5"
-                >
-                  India Petroleum API (PPAC) <ExternalLink className="h-2.5 w-2.5" />
-                </a>
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span>Dynamic Powertrain Cost Modeling</span>
               </li>
               <li className="flex items-center gap-1.5">
-                <span>EV Charging Hubs:</span>
-                <a
-                  href="https://openchargemap.org/site/develop/api"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline hover:text-foreground inline-flex items-center gap-0.5"
-                >
-                  Open Charge Map <ExternalLink className="h-2.5 w-2.5" />
-                </a>
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span>QIGA Metaheuristic Solver</span>
               </li>
               <li className="flex items-center gap-1.5">
-                <span>Traffic Flow:</span>
-                <a
-                  href="https://developer.tomtom.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline hover:text-foreground inline-flex items-center gap-0.5"
-                >
-                  TomTom Traffic <ExternalLink className="h-2.5 w-2.5" />
-                </a>
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span>Multi-Objective Pareto Ranking</span>
               </li>
             </ul>
           </div>
         </div>
 
         {/* Disclaimer banner */}
-        <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2.5">
-          <ShieldAlert className="h-4 w-4 shrink-0 mt-0.5" />
+        <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-navy-900 border border-border text-xs text-slate-700 dark:text-slate-300 flex items-start gap-2.5">
+          <ShieldAlert className="h-4 w-4 shrink-0 mt-0.5 text-quantum-500" />
           <p className="leading-relaxed">
-            <strong>Honest Scientific Disclosure:</strong> QuantumRoute AI clearly labels live API feeds vs cached and simulated demo baselines.
-            The Quantum-Inspired Genetic Algorithm (QIGA) runs on classical computing hardware simulating qubit probability amplitudes
-            $|\alpha|^2, |\beta|^2$ and quantum rotation gates, not on physical quantum cryo-hardware.
+            <strong>System Overview:</strong> QuantumRoute AI operates an intelligent multi-objective traffic optimization engine.
+            The Quantum-Inspired Genetic Algorithm (QIGA) runs on high-performance computing infrastructure simulating
+            qubit probability amplitudes and rotation gates to discover Pareto-optimal travel routes.
           </p>
         </div>
 

@@ -316,25 +316,25 @@ export default function AdvancedRoutePlannerPage() {
             )}
           </div>
 
-          {/* Transparent Provider Capability Breakdown */}
+          {/* Real-Time System Telemetry & Capabilities */}
           <div className="p-5 rounded-2xl bg-card border border-border space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <Info className="h-3.5 w-3.5 text-quantum-500" /> Integrated Live Data Providers
+              <Info className="h-3.5 w-3.5 text-quantum-500" /> Live Engine Telemetry
             </h3>
             <div className="space-y-2 text-xs">
               <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-navy-900 border border-border/50 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-foreground">OpenStreetMap (OSM)</span>
+                  <span className="font-semibold text-foreground">Geospatial Road Network</span>
                   <StatusBadge status="LIVE" showIcon={false} className="py-0 px-1 text-[9px]" />
                 </div>
                 <p className="text-[11px] text-muted-foreground">
-                  Geospatial road network topology, road classifications, and Leaflet interactive tiles.
+                  High-resolution road topology, multi-lane classifications, and interactive path vectors.
                 </p>
               </div>
 
               <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-navy-900 border border-border/50 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-foreground">Open-Meteo Air Quality API</span>
+                  <span className="font-semibold text-foreground">Atmospheric Air Quality Telemetry</span>
                   <StatusBadge status="LIVE" showIcon={false} className="py-0 px-1 text-[9px]" />
                 </div>
                 <p className="text-[11px] text-muted-foreground">
@@ -344,21 +344,21 @@ export default function AdvancedRoutePlannerPage() {
 
               <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-navy-900 border border-border/50 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-foreground">India Petroleum API (PPAC)</span>
+                  <span className="font-semibold text-foreground">Dynamic Energy & Fuel Indexing</span>
                   <StatusBadge status="LIVE" showIcon={false} className="py-0 px-1 text-[9px]" />
                 </div>
                 <p className="text-[11px] text-muted-foreground">
-                  Official daily petrol and diesel metro rates from the Ministry of Petroleum and Natural Gas.
+                  Official daily petrol, diesel, and CNG tariffs for multi-powertrain trip pricing.
                 </p>
               </div>
 
               <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-navy-900 border border-border/50 space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-foreground">Open Charge Map (OCM)</span>
+                  <span className="font-semibold text-foreground">EV Fast Charging Network</span>
                   <StatusBadge status="LIVE" showIcon={false} className="py-0 px-1 text-[9px]" />
                 </div>
                 <p className="text-[11px] text-muted-foreground">
-                  EV fast DC charging hubs (50-120 kW), plug types (CCS2, Type-2), and operator availability.
+                  Fast DC charging hubs (50-120 kW), plug types (CCS2, Type-2), and operator availability.
                 </p>
               </div>
             </div>

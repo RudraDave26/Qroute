@@ -10,7 +10,7 @@ const InteractiveMapInternal = dynamic(() => import('./InteractiveMap'), {
     <div className="w-full h-full min-h-[450px] flex items-center justify-center bg-slate-100 dark:bg-navy-900 rounded-2xl border border-border">
       <div className="flex flex-col items-center gap-3">
         <div className="h-8 w-8 rounded-full border-2 border-quantum-500 border-t-transparent animate-spin" />
-        <span className="text-sm font-medium text-muted-foreground">Initializing OpenStreetMap Canvas...</span>
+        <span className="text-sm font-medium text-muted-foreground">Initializing Geospatial Map Canvas...</span>
       </div>
     </div>
   ),
