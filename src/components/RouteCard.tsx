@@ -57,29 +57,32 @@ export function RouteCard({ route, isSelected, onSelect }: RouteCardProps) {
 
       <p className="text-xs text-muted-foreground mt-1 ml-6">{route.summary}</p>
 
-      {/* 3 Simple KPI Badges */}
-      <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-border/60 text-xs">
+      {/* 4 KPI Badges: ETA, Distance, Estimated Cost, Emissions */}
+      <div className="grid grid-cols-4 gap-1.5 mt-3 pt-3 border-t border-border/60 text-xs">
+        {/* ETA */}
+        <div className="p-1.5 rounded-xl bg-background/80 border border-border/50 text-center">
+          <span className="text-[9px] text-muted-foreground block font-medium">ETA</span>
+          <span className="font-bold text-foreground text-[11px]">
+            {new Date(Date.now() + route.durationMin * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </span>
+        </div>
+
         {/* Distance */}
-        <div className="p-2 rounded-xl bg-background/80 border border-border/50 text-center">
-          <span className="text-[10px] text-muted-foreground block font-medium">Distance</span>
-          <span className="font-bold text-foreground">{formatDistance(route.distanceKm)}</span>
+        <div className="p-1.5 rounded-xl bg-background/80 border border-border/50 text-center">
+          <span className="text-[9px] text-muted-foreground block font-medium">Distance</span>
+          <span className="font-bold text-foreground text-[11px]">{formatDistance(route.distanceKm)}</span>
         </div>
 
         {/* Cost */}
-        <div className="p-2 rounded-xl bg-background/80 border border-border/50 text-center">
-          <span className="text-[10px] text-muted-foreground block font-medium">Est. Cost</span>
-          <span className="font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(route.fuelCostInr)}</span>
+        <div className="p-1.5 rounded-xl bg-background/80 border border-border/50 text-center">
+          <span className="text-[9px] text-muted-foreground block font-medium">Est. Cost</span>
+          <span className="font-bold text-emerald-600 dark:text-emerald-400 text-[11px]">{formatCurrency(route.fuelCostInr)}</span>
         </div>
 
-        {/* Traffic Status */}
-        <div className="p-2 rounded-xl bg-background/80 border border-border/50 text-center">
-          <span className="text-[10px] text-muted-foreground block font-medium">Traffic</span>
-          <span className={cn(
-            'font-bold',
-            route.trafficDelayMin > 5 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'
-          )}>
-            {route.trafficDelayMin > 0 ? `+${route.trafficDelayMin}m jam` : 'Smooth'}
-          </span>
+        {/* Emissions */}
+        <div className="p-1.5 rounded-xl bg-background/80 border border-border/50 text-center">
+          <span className="text-[9px] text-muted-foreground block font-medium">Emissions</span>
+          <span className="font-bold text-cyan-600 dark:text-cyan-400 text-[11px]">{formatEmissions(route.emissionsKg)}</span>
         </div>
       </div>
 

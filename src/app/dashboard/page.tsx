@@ -36,6 +36,9 @@ import {
   Wind,
   BatteryCharging,
   Fuel,
+  Plus,
+  X,
+  Sparkles,
 } from 'lucide-react';
 import { formatCurrency, formatDistance, formatDuration, formatEmissions } from '@/lib/utils';
 
@@ -57,6 +60,7 @@ export default function DashboardPage() {
   const [destQuery, setDestQuery] = useState('Whitefield ITPL, Bengaluru');
   const [originSuggestions, setOriginSuggestions] = useState<any[]>([]);
   const [destSuggestions, setDestSuggestions] = useState<any[]>([]);
+  const [stops, setStops] = useState<Array<{ id: string; lat: number; lng: number; label: string; query: string; suggestions: any[] }>>([]);
 
   // Navigation settings
   const [vehicleType, setVehicleType] = useState<VehicleType>('petrol');
@@ -102,6 +106,7 @@ export default function DashboardPage() {
         body: JSON.stringify({
           origin,
           destination,
+          stops: stops.filter((s) => s.lat && s.lng).map((s) => ({ lat: s.lat, lng: s.lng, label: s.label })),
           vehicleType,
           objective,
           avoidTolls,
@@ -224,6 +229,61 @@ export default function DashboardPage() {
     } else {
       setDestSuggestions([]);
     }
+  };
+
+  const addIntermediateStop = () => {
+    if (stops.length >= 3) return;
+    setStops([
+      ...stops,
+      {
+        id: `stop-${Date.now()}`,
+        lat: 0,
+        lng: 0,
+        label: '',
+        query: '',
+        suggestions: [],
+      },
+    ]);
+  };
+
+  const removeIntermediateStop = (index: number) => {
+    setStops(stops.filter((_, i) => i !== index));
+  };
+
+  const handleStopSearch = async (index: number, val: string) => {
+    const nextStops = [...stops];
+    nextStops[index].query = val;
+    setStops(nextStops);
+
+    if (val.trim().length >= 2) {
+      try {
+        const res = await fetch(`/api/geocode?q=${encodeURIComponent(val)}`);
+        if (res.ok) {
+          const data = await res.json();
+          const updated = [...stops];
+          if (updated[index]) {
+            updated[index].suggestions = data.results || [];
+            setStops(updated);
+          }
+        }
+      } catch (e) {}
+    } else {
+      const updated = [...stops];
+      if (updated[index]) {
+        updated[index].suggestions = [];
+        setStops(updated);
+      }
+    }
+  };
+
+  const selectStopLocation = (index: number, item: any) => {
+    const nextStops = [...stops];
+    nextStops[index].lat = item.lat;
+    nextStops[index].lng = item.lng;
+    nextStops[index].label = item.name;
+    nextStops[index].query = item.name;
+    nextStops[index].suggestions = [];
+    setStops(nextStops);
   };
 
   const swapEndpoints = () => {
@@ -409,17 +469,67 @@ export default function DashboardPage() {
               )}
             </div>
 
-            {/* Swap Button */}
-            <div className="flex justify-end -my-1 pr-4">
+            {/* Swap & Add Multiple Stops Controls */}
+            <div className="flex items-center justify-between px-1 -my-0.5">
+              <button
+                type="button"
+                onClick={addIntermediateStop}
+                disabled={stops.length >= 3}
+                className="inline-flex items-center gap-1 text-[11px] font-semibold text-quantum-600 dark:text-quantum-400 hover:text-quantum-700 disabled:opacity-40 transition-colors"
+                title="Add intermediate stops to your route"
+              >
+                <Plus className="h-3 w-3" />
+                <span>+ Add Stop {stops.length > 0 ? `(${stops.length}/3)` : ''}</span>
+              </button>
+
               <button
                 type="button"
                 onClick={swapEndpoints}
                 title="Swap Origin and Destination"
-                className="p-1 rounded-full bg-muted border border-border text-muted-foreground hover:text-foreground hover:bg-background transition-colors shadow-xs"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted border border-border text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-background transition-colors shadow-xs"
               >
-                <ArrowUpDown className="h-3 w-3" />
+                <ArrowUpDown className="h-2.5 w-2.5" />
+                <span>Swap</span>
               </button>
             </div>
+
+            {/* Intermediate Stops Inputs */}
+            {stops.map((stop, sIdx) => (
+              <div key={stop.id} className="relative">
+                <div className="absolute left-3 top-3 h-2.5 w-2.5 rounded-full bg-amber-500 ring-2 ring-amber-500/20" />
+                <input
+                  type="text"
+                  value={stop.query}
+                  onChange={(e) => handleStopSearch(sIdx, e.target.value)}
+                  placeholder={`Stop ${sIdx + 1}: add city or address...`}
+                  className="w-full pl-9 pr-9 py-2 rounded-xl text-xs sm:text-sm bg-background border border-border focus:outline-hidden focus:ring-2 focus:ring-amber-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeIntermediateStop(sIdx)}
+                  className="absolute right-2.5 top-2.5 p-1 text-muted-foreground hover:text-rose-500 transition-colors"
+                  title="Remove stop"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+
+                {stop.suggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-50 max-h-48 overflow-y-auto">
+                    {stop.suggestions.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => selectStopLocation(sIdx, item)}
+                        className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/40 last:border-0"
+                      >
+                        <p className="font-semibold text-foreground truncate">{item.name}</p>
+                        <p className="text-[10px] text-muted-foreground line-clamp-1">{item.displayName}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
 
             {/* Destination Input */}
             <div className="relative">
@@ -563,22 +673,22 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Plan Route Trigger */}
+          {/* Plan Route Trigger: One clear Find Best Route button */}
           <button
             type="button"
             onClick={fetchRouteData}
             disabled={isLoadingRoutes}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-all disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm bg-primary text-primary-foreground hover:bg-primary/90 shadow-md transition-all disabled:opacity-50"
           >
             {isLoadingRoutes ? (
               <>
                 <RefreshCw className="h-4 w-4 animate-spin" />
-                <span>Computing Multi-Objective Routes...</span>
+                <span>Computing Best Routes...</span>
               </>
             ) : (
               <>
-                <Search className="h-4 w-4 text-quantum-300" />
-                <span>Calculate Optimized Routes</span>
+                <Sparkles className="h-4 w-4 text-quantum-300" />
+                <span>Find Best Route</span>
               </>
             )}
           </button>
