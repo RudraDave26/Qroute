@@ -6,65 +6,65 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    --background: 225 25% 97%; /* #F4F6FA Soft Grey */
+    --foreground: 220 48% 9%; /* #0B1220 Deep Navy */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card: 0 0% 100%; /* #FFFFFF Crisp White */
+    --card-foreground: 220 48% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 220 48% 9%;
 
-    --primary: 221 83% 20%; /* Deep Navy */
-    --primary-foreground: 210 40% 98%;
+    --primary: 220 48% 9%; /* #0B1220 Navy */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 199 89% 48%; /* Electric Cyan / Teal */
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 173 80% 40%; /* #14B8A6 Teal */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 225 20% 93%;
+    --muted-foreground: 220 15% 46%;
 
-    --accent: 187 92% 45%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 173 80% 40%; /* #14B8A6 Teal Highlights */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%; /* Red for traffic severity & critical alerts */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 199 89% 48%;
+    --border: 220 20% 90%; /* #E5E9F2 Soft Grey Border */
+    --input: 220 20% 90%;
+    --ring: 173 80% 40%; /* #14B8A6 Teal Focus */
 
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 222 47% 7%;
-    --foreground: 210 40% 98%;
+    --background: 220 48% 9%; /* #0B1220 Deep Navy */
+    --foreground: 0 0% 100%; /* #FFFFFF White */
 
-    --card: 222 47% 10%;
-    --card-foreground: 210 40% 98%;
+    --card: 221 44% 12%; /* #101A30 Dark Navy Card */
+    --card-foreground: 0 0% 100%;
 
-    --popover: 222 47% 10%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 221 44% 12%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 11%;
+    --primary: 173 80% 40%; /* #14B8A6 Teal Highlight */
+    --primary-foreground: 220 48% 9%;
 
-    --secondary: 199 89% 48%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 173 80% 40%;
+    --secondary-foreground: 220 48% 9%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 220 35% 15%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 187 92% 45%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 173 80% 40%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217 33% 18%;
-    --input: 217 33% 18%;
-    --ring: 199 89% 48%;
+    --border: 220 30% 17%;
+    --input: 220 30% 17%;
+    --ring: 173 80% 40%;
   }
 }
 
@@ -126,7 +126,7 @@
 }
 
 .leaflet-control-zoom a:hover {
-  background-color: #06b6d4 !important;
+  background-color: #14b8a6 !important;
   color: #ffffff !important;
 }
 
@@ -135,21 +135,24 @@
   border: none;
 }
 
-@keyframes leaflet-ping {
+/* Subtle loading skeleton shimmer */
+@keyframes skeleton-shimmer {
   0% {
-    transform: scale(0.9);
-    opacity: 0.8;
-  }
-  70% {
-    transform: scale(2.2);
-    opacity: 0;
+    background-position: -200% 0;
   }
   100% {
-    transform: scale(2.4);
-    opacity: 0;
+    background-position: 200% 0;
   }
 }
 
-.animate-map-ping {
-  animation: leaflet-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #f4f6fa 25%, #e5e9f2 50%, #f4f6fa 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.8s infinite;
+}
+
+.dark .skeleton-shimmer {
+  background: linear-gradient(90deg, #101a30 25%, #1e293b 50%, #101a30 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.8s infinite;
 }

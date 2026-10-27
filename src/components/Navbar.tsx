@@ -64,16 +64,15 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="relative flex items-center justify-center h-10 w-10 rounded-xl bg-gradient-to-br from-navy-900 via-navy-800 to-quantum-800 text-white shadow-md shadow-quantum-500/20 group-hover:scale-105 transition-transform duration-300">
-            <Atom className="h-5 w-5 text-quantum-300 animate-spin-slow" />
-            <div className="absolute -inset-0.5 rounded-xl bg-quantum-400 opacity-20 blur-xs group-hover:opacity-40 transition-opacity" />
+          <div className="relative flex items-center justify-center h-10 w-10 rounded-xl bg-[#0B1220] text-[#14B8A6] shadow-sm border border-slate-800 group-hover:scale-105 transition-transform duration-200">
+            <Atom className="h-5 w-5 text-[#14B8A6]" />
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-navy-900 to-navy-700 dark:from-white dark:to-slate-200 bg-clip-text text-transparent">
+              <span className="font-bold text-lg tracking-tight text-[#0B1220] dark:text-white">
                 QuantumRoute
               </span>
-              <span className="px-1.5 py-0.5 text-[10px] font-bold tracking-wider rounded bg-quantum-500/15 text-quantum-700 dark:text-quantum-300 border border-quantum-500/30">
+              <span className="px-1.5 py-0.5 text-[10px] font-bold tracking-wider rounded bg-[#14B8A6]/15 text-[#14B8A6] border border-[#14B8A6]/30">
                 AI
               </span>
             </div>
@@ -93,18 +92,14 @@ export function Navbar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200',
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200',
                   isActive
-                    ? 'bg-primary text-primary-foreground shadow-xs'
-                    : 'text-foreground/80 hover:text-foreground hover:bg-muted',
-                  item.isHighlight && !isActive && 'text-quantum-600 dark:text-quantum-400 hover:bg-quantum-500/10'
+                    ? 'bg-[#14B8A6] text-white shadow-xs'
+                    : 'text-[#0B1220]/80 dark:text-white/80 hover:text-[#0B1220] dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 )}
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-3.5 w-3.5" />
                 <span>{item.label}</span>
-                {item.isHighlight && !isActive && (
-                  <span className="h-1.5 w-1.5 rounded-full bg-quantum-500 animate-pulse" />
-                )}
               </Link>
             );
           })}
