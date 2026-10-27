@@ -22,6 +22,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { StatusBadge } from '@/components/StatusBadge';
+import { Footer } from '@/components/Footer';
 
 export default function LandingPage() {
   const quickDemoTrips = [
@@ -306,6 +307,9 @@ export default function LandingPage() {
           </Link>
         </div>
       </section>
+
+      {/* Footer rendered only on starting page */}
+      <Footer />
     </div>
   );
 }
