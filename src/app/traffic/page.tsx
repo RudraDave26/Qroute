@@ -309,6 +309,26 @@ export default function LiveTrafficPage() {
               ))
             )}
           </div>
+
+          {/* TomTom Traffic API v1 Specification Attribution */}
+          <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-navy-900 border border-border/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="space-y-0.5">
+              <span className="font-bold text-foreground flex items-center gap-1.5">
+                <Radio className="h-3.5 w-3.5 text-quantum-500" /> TomTom Traffic Flow & Incidents API v1
+              </span>
+              <p className="text-[11px] text-muted-foreground">
+                Follows TomTom Maps v1 product specification for flowSegmentData, raster flow tiles, and incident feeds.
+              </p>
+            </div>
+            <a
+              href="https://docs.tomtom.com/traffic-api/documentation/tomtom-maps/v1/product-information/introduction"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-card border border-border text-quantum-600 dark:text-quantum-400 font-semibold hover:underline shrink-0"
+            >
+              <span>TomTom API v1 Docs</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>

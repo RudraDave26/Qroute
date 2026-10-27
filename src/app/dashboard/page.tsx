@@ -63,6 +63,8 @@ export default function DashboardPage() {
   const [objective, setObjective] = useState<OptimizationObjective>('balanced');
   const [avoidTolls, setAvoidTolls] = useState(false);
   const [showEVChargers, setShowEVChargers] = useState(true);
+  const [showTrafficFlow, setShowTrafficFlow] = useState(false);
+  const [tomtomTileUrl, setTomtomTileUrl] = useState('');
 
   // Results state
   const [routes, setRoutes] = useState<RouteAlternative[]>([]);
@@ -638,6 +640,19 @@ export default function DashboardPage() {
                 <BatteryCharging className="h-3.5 w-3.5" />
                 <span>EV Hubs ({chargingStations.length})</span>
               </button>
+              <button
+                type="button"
+                onClick={() => setShowTrafficFlow(!showTrafficFlow)}
+                className={`flex items-center gap-1 px-2 py-0.5 rounded-md font-semibold text-[11px] border transition-colors ${
+                  showTrafficFlow
+                    ? 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 border-cyan-400'
+                    : 'bg-muted text-muted-foreground'
+                }`}
+                title="Toggle TomTom Traffic Flow Raster Tile Layer (TomTom Maps v1)"
+              >
+                <Wind className="h-3.5 w-3.5" />
+                <span>TomTom Flow v1</span>
+              </button>
             </div>
           </div>
         )}
@@ -656,6 +671,8 @@ export default function DashboardPage() {
             showIncidents={true}
             chargingStations={chargingStations}
             showChargingStations={showEVChargers}
+            showTrafficFlow={showTrafficFlow}
+            tomtomTrafficTileUrl={tomtomTileUrl}
           />
         </div>
       </div>

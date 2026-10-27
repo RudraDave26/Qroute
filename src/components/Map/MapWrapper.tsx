@@ -28,6 +28,8 @@ interface MapWrapperProps {
   showIncidents?: boolean;
   chargingStations?: EVChargingStation[];
   showChargingStations?: boolean;
+  showTrafficFlow?: boolean;
+  tomtomTrafficTileUrl?: string;
 }
 
 export function MapWrapper(props: MapWrapperProps) {

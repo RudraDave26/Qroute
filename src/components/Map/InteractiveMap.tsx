@@ -19,6 +19,8 @@ interface InteractiveMapProps {
   showIncidents?: boolean;
   chargingStations?: EVChargingStation[];
   showChargingStations?: boolean;
+  showTrafficFlow?: boolean;
+  tomtomTrafficTileUrl?: string;
 }
 
 // Controller component to smoothly pan/fit bounds when routes or endpoints change
@@ -71,6 +73,8 @@ export default function InteractiveMap({
   showIncidents = true,
   chargingStations = [],
   showChargingStations = true,
+  showTrafficFlow = false,
+  tomtomTrafficTileUrl = '',
 }: InteractiveMapProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -166,6 +170,16 @@ export default function InteractiveMap({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maxZoom={19}
         />
+
+        {/* Optional TomTom Traffic Flow Raster Tile Layer (TomTom Maps v1) */}
+        {showTrafficFlow && tomtomTrafficTileUrl && (
+          <TileLayer
+            attribution='&copy; <a href="https://docs.tomtom.com/traffic-api/documentation/tomtom-maps/v1/product-information/introduction" target="_blank" rel="noreferrer">TomTom Traffic v1</a>'
+            url={tomtomTrafficTileUrl}
+            maxZoom={19}
+            opacity={0.65}
+          />
+        )}
 
         <MapBoundsController
           origin={origin}
