@@ -272,11 +272,10 @@ export default function InteractiveMap({
         scrollWheelZoom={true}
         className="w-full h-full"
       >
-        {/* Clean Modern Vector Basemap Tile Layer */}
+        {/* OpenStreetMap (OSM) Tile Layer */}
         <TileLayer
           attribution="&copy; QuantumRoute AI Geospatial Network"
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-          subdomains="abcd"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maxZoom={19}
         />
 
