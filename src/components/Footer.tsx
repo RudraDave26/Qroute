@@ -82,14 +82,36 @@ export function Footer() {
                 </a>
               </li>
               <li className="flex items-center gap-1.5">
-                <span>Air Quality & Weather:</span>
+                <span>Air Quality:</span>
                 <a
                   href="https://open-meteo.com/en/docs/air-quality-api"
                   target="_blank"
                   rel="noreferrer"
                   className="underline hover:text-foreground inline-flex items-center gap-0.5"
                 >
-                  Open-Meteo AQI API <ExternalLink className="h-2.5 w-2.5" />
+                  Open-Meteo AQI <ExternalLink className="h-2.5 w-2.5" />
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5">
+                <span>India Admin (37 States, 635 Dist.):</span>
+                <a
+                  href="https://api.openadmindata.org/api/v1/countries/in.json"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline hover:text-foreground inline-flex items-center gap-0.5"
+                >
+                  OpenAdminData <ExternalLink className="h-2.5 w-2.5" />
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5">
+                <span>India LGD Cities & ULBs:</span>
+                <a
+                  href="https://lgd-json-api.vercel.app/docs"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline hover:text-foreground inline-flex items-center gap-0.5"
+                >
+                  LGD JSON API <ExternalLink className="h-2.5 w-2.5" />
                 </a>
               </li>
               <li className="flex items-center gap-1.5">
@@ -111,7 +133,7 @@ export function Footer() {
                   rel="noreferrer"
                   className="underline hover:text-foreground inline-flex items-center gap-0.5"
                 >
-                  Open Charge Map API <ExternalLink className="h-2.5 w-2.5" />
+                  Open Charge Map <ExternalLink className="h-2.5 w-2.5" />
                 </a>
               </li>
               <li className="flex items-center gap-1.5">

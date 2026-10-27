@@ -87,7 +87,30 @@ Where:
 - **Data Visualization**: Recharts
 - **Animations**: Framer Motion
 - **Validation**: Zod
-- **External Providers**: TomTom Traffic & Routing APIs, OpenStreetMap Nominatim, Open-Meteo Weather API
+- **External Providers & Data Feeds**:
+  - **OpenStreetMap (OSM)**: Base cartography, raster tiles, and Nominatim forward/reverse geocoding (`https://www.openstreetmap.org/`).
+  - **OpenAdminData India**: Official 37 States/UTs and 635 districts hierarchy with Hindi/English bilingual names, population data, and geospatial centroids (`https://api.openadmindata.org/api/v1/countries/in.json`).
+  - **LGD JSON API (Local Government Directory)**: India Urban Local Bodies (ULBs), municipal corporations, municipalities, and cities registry (`https://lgd-json-api.vercel.app/docs`).
+  - **Open-Meteo Air Quality API**: Real-time European AQI, US AQI, PM2.5, PM10, and NO₂ levels (`https://open-meteo.com/en/docs/air-quality-api`).
+  - **India Petroleum API**: Real-time PPAC daily petrol and diesel tariffs across Indian metros (`https://india-petroleum-api.vercel.app/docs`).
+  - **Open Charge Map API**: Global electric vehicle charging station network with kW rating and connector types (`https://openchargemap.org/site/develop/api`).
+  - **TomTom Traffic API**: Real-time incident telemetry, segment speed flow, and raster flow tiles (`https://developer.tomtom.com/`).
+
+---
+
+## 5. API Endpoints
+
+- `GET /api/admin/states` — Returns all 37 Indian States and Union Territories with bilingual names and centroid coordinates.
+- `GET /api/admin/districts?stateId=...` — Returns 635 Indian districts filtered by parent state or keyword.
+- `GET /api/admin/cities?q=jaipur` — Queries LGD Indian Cities and pairs with geocoded coordinates.
+- `GET /api/geocode?q=...` — Unified location search across Indian administrative boundaries, local presets, and OpenStreetMap.
+- `GET /api/air-quality?lat=...&lng=...` — Live atmospheric air quality index and particulate metrics.
+- `GET /api/fuel-prices` — Daily fuel tariffs from PPAC.
+- `GET /api/charging-stations?lat=...&lng=...` — Nearby fast DC and AC EV charging hubs.
+- `GET /api/traffic/flow` — Real-time TomTom flow vector metrics and tile endpoint.
+- `GET /api/traffic/incidents` — Live traffic delay events, closures, and hazard telemetry.
+- `POST /api/routes` — Multi-alternative route generator comparing fastest, cheapest, shortest, eco, and balanced paths.
+- `POST /api/optimization/run` — Benchmarking suite running Dijkstra, A*, Classical GA, and QIGA.
 
 ---
 

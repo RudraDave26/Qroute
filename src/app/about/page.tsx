@@ -301,6 +301,42 @@ export default function AboutResearchPage() {
               Global registry of Electric Vehicle (EV) public and fast DC charging points, power ratings in kW, and connector types.
             </p>
           </div>
+
+          <div className="p-4 rounded-xl bg-card border border-border space-y-1.5">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-foreground">5. OpenAdminData India API</h4>
+              <a
+                href="https://api.openadmindata.org/api/v1/countries/in.json"
+                target="_blank"
+                rel="noreferrer"
+                className="text-quantum-600 dark:text-quantum-400 hover:underline flex items-center gap-1 font-semibold"
+              >
+                <span>Docs</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <p className="text-muted-foreground leading-relaxed">
+              Open administrative hierarchy dataset providing localized Hindi and English names, population figures, and centroid coordinates for all 37 Indian States/UTs and 635 Districts.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-card border border-border space-y-1.5">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-foreground">6. Local Government Directory (LGD) JSON API</h4>
+              <a
+                href="https://lgd-json-api.vercel.app/docs"
+                target="_blank"
+                rel="noreferrer"
+                className="text-quantum-600 dark:text-quantum-400 hover:underline flex items-center gap-1 font-semibold"
+              >
+                <span>Docs</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <p className="text-muted-foreground leading-relaxed">
+              Official Indian Local Government Directory (LGD) REST service for 5,000+ Urban Local Bodies (ULBs), municipal corporations, municipalities, and cities.
+            </p>
+          </div>
         </div>
       </section>
 

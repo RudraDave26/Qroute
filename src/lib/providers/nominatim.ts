@@ -1,4 +1,5 @@
 import { LatLng } from '../types';
+import { searchIndianAdministrativeEntities } from './indianAdminData';
 
 export interface SearchResultItem {
   id: string;
@@ -7,6 +8,7 @@ export interface SearchResultItem {
   lat: number;
   lng: number;
   type: string;
+  badge?: string;
 }
 
 export const PRESET_LOCATIONS: SearchResultItem[] = [
@@ -50,17 +52,42 @@ export async function searchGeocode(query: string): Promise<SearchResultItem[]> 
   if (!clean || clean.length < 2) return [];
 
   // 1. Fast match against presets
-  const presetMatches = PRESET_LOCATIONS.filter(
+  const presetMatches: SearchResultItem[] = PRESET_LOCATIONS.filter(
     (item) =>
       item.name.toLowerCase().includes(clean) ||
       item.displayName.toLowerCase().includes(clean)
   );
 
-  if (presetMatches.length >= 3) {
-    return presetMatches;
+  // 2. Fetch matches from Indian Administrative APIs (LGD & OpenAdminData)
+  let adminMatches: SearchResultItem[] = [];
+  try {
+    const adminEntities = await searchIndianAdministrativeEntities(clean);
+    adminMatches = adminEntities.map((ent) => ({
+      id: ent.id,
+      name: ent.name,
+      displayName: ent.displayName,
+      lat: ent.lat,
+      lng: ent.lng,
+      type: ent.type,
+      badge: ent.category,
+    }));
+  } catch (err) {
+    // Graceful fallback if admin service is temporarily unreachable
   }
 
-  // 2. Fetch from Nominatim if online with strict 2.5s timeout
+  // Combine presets and Indian Admin matches
+  const localResults: SearchResultItem[] = [...presetMatches];
+  for (const item of adminMatches) {
+    if (!localResults.some((c) => Math.abs(c.lat - item.lat) < 0.01 && Math.abs(c.lng - item.lng) < 0.01)) {
+      localResults.push(item);
+    }
+  }
+
+  if (localResults.length >= 5) {
+    return localResults.slice(0, 8);
+  }
+
+  // 3. Fetch from OpenStreetMap Nominatim for street-level or international queries
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 2500);
@@ -88,20 +115,21 @@ export async function searchGeocode(query: string): Promise<SearchResultItem[]> 
         lat: parseFloat(item.lat),
         lng: parseFloat(item.lon),
         type: item.type || 'place',
+        badge: 'OpenStreetMap',
       }));
 
-      // Combine preset matches with online matches (unique by id)
-      const combined = [...presetMatches];
+      // Combine local matches with OSM Nominatim results
+      const combined = [...localResults];
       for (const item of nominatimResults) {
-        if (!combined.some((c) => Math.abs(c.lat - item.lat) < 0.001 && Math.abs(c.lng - item.lng) < 0.001)) {
+        if (!combined.some((c) => Math.abs(c.lat - item.lat) < 0.005 && Math.abs(c.lng - item.lng) < 0.005)) {
           combined.push(item);
         }
       }
-      return combined.slice(0, 7);
+      return combined.slice(0, 8);
     }
   } catch (err) {
-    // Timeout or network offline: gracefully return preset matches
+    // Timeout or network offline: gracefully return local results
   }
 
-  return presetMatches.slice(0, 5);
+  return localResults.slice(0, 6);
 }

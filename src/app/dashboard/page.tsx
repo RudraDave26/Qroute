@@ -345,6 +345,17 @@ export default function DashboardPage() {
             </div>
           )}
 
+          {/* India Administrative Data indicator */}
+          <div className="flex items-center justify-between px-1 text-[10px] text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>India Geodata: LGD & OpenAdmin (37 States, 635 Dist.)</span>
+            </span>
+            <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold border border-emerald-500/20">
+              ACTIVE
+            </span>
+          </div>
+
           {/* Origin and Destination Search Inputs */}
           <div className="relative space-y-2">
             {/* Origin Input */}
@@ -368,7 +379,7 @@ export default function DashboardPage() {
 
               {/* Origin Autocomplete dropdown */}
               {originSuggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-50 max-h-48 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-50 max-h-56 overflow-y-auto">
                   {originSuggestions.map((item) => (
                     <button
                       key={item.id}
@@ -383,7 +394,14 @@ export default function DashboardPage() {
                       }}
                       className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/40 last:border-0"
                     >
-                      <p className="font-semibold text-foreground">{item.name}</p>
+                      <div className="flex items-center justify-between gap-1.5">
+                        <p className="font-semibold text-foreground truncate">{item.name}</p>
+                        {item.badge && (
+                          <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-navy-900 border border-border text-slate-600 dark:text-slate-300 font-medium shrink-0">
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-[10px] text-muted-foreground line-clamp-1">{item.displayName}</p>
                     </button>
                   ))}
@@ -416,7 +434,7 @@ export default function DashboardPage() {
 
               {/* Destination Autocomplete dropdown */}
               {destSuggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-50 max-h-48 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-50 max-h-56 overflow-y-auto">
                   {destSuggestions.map((item) => (
                     <button
                       key={item.id}
@@ -428,7 +446,14 @@ export default function DashboardPage() {
                       }}
                       className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/40 last:border-0"
                     >
-                      <p className="font-semibold text-foreground">{item.name}</p>
+                      <div className="flex items-center justify-between gap-1.5">
+                        <p className="font-semibold text-foreground truncate">{item.name}</p>
+                        {item.badge && (
+                          <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-navy-900 border border-border text-slate-600 dark:text-slate-300 font-medium shrink-0">
+                            {item.badge}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-[10px] text-muted-foreground line-clamp-1">{item.displayName}</p>
                     </button>
                   ))}
@@ -439,7 +464,23 @@ export default function DashboardPage() {
 
           {/* Quick Presets for Demo */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] text-muted-foreground scrollbar-none">
-            <span className="font-semibold shrink-0">Quick Presets:</span>
+            <span className="font-semibold shrink-0">Quick Trips:</span>
+            <button
+              type="button"
+              onClick={() => {
+                const jaipur = { lat: 26.9124, lng: 75.7873, label: 'Jaipur, Rajasthan (LGD: 303088)' };
+                const delhi = { lat: 28.6139, lng: 77.2090, label: 'New Delhi (IN03)' };
+                setOrigin(jaipur);
+                setOriginQuery('Jaipur, Rajasthan');
+                setDestination(delhi);
+                setDestQuery('New Delhi');
+                fetchAirQualityData(jaipur.lat, jaipur.lng);
+                fetchChargingData(jaipur.lat, jaipur.lng);
+              }}
+              className="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800 hover:bg-amber-500/20 shrink-0 font-medium"
+            >
+              🇮🇳 Jaipur → Delhi
+            </button>
             <button
               type="button"
               onClick={() => {
@@ -467,6 +508,22 @@ export default function DashboardPage() {
               className="px-2 py-0.5 rounded-md bg-muted hover:bg-muted/80 shrink-0"
             >
               DEL: CP → Cyber City
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const mum = { lat: 19.0760, lng: 72.8777, label: 'Mumbai, Maharashtra (IN11)' };
+                const pun = { lat: 18.5204, lng: 73.8567, label: 'Pune, Maharashtra' };
+                setOrigin(mum);
+                setOriginQuery('Mumbai, Maharashtra');
+                setDestination(pun);
+                setDestQuery('Pune, Maharashtra');
+                fetchAirQualityData(mum.lat, mum.lng);
+                fetchChargingData(mum.lat, mum.lng);
+              }}
+              className="px-2 py-0.5 rounded-md bg-muted hover:bg-muted/80 shrink-0"
+            >
+              MUM → PUN Expressway
             </button>
           </div>
 
