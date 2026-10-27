@@ -29,8 +29,6 @@ import {
   BatteryCharging,
   X,
   Sparkles,
-  PanelLeftClose,
-  PanelLeftOpen,
   Hotel,
   Trees,
   Plus,
@@ -68,11 +66,6 @@ function DashboardContent() {
   const [showEVChargers, setShowEVChargers] = useState(false);
   const [showTrafficFlow, setShowTrafficFlow] = useState(false);
   const [tomtomTileUrl, setTomtomTileUrl] = useState('');
-
-  // UI state for clutter reduction, responsiveness & mobile bottom sheet
-  const [showAnalyticsDrawer, setShowAnalyticsDrawer] = useState(false);
-  const [isMobileSheetExpanded, setIsMobileSheetExpanded] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Results state
   const [routes, setRoutes] = useState<RouteAlternative[]>([]);
@@ -531,36 +524,469 @@ function DashboardContent() {
     [intermediatePlaces]
   );
 
-  const renderPlacesSection = () => {
-    return (
-      <div className="pt-2">
-        <button
-          type="button"
-          onClick={() => setShowPlacesSection(!showPlacesSection)}
-          className="w-full py-2.5 px-3 rounded-xl border border-border text-xs font-bold flex items-center justify-between text-foreground bg-muted hover:bg-muted/80 transition-colors"
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-sm">🏨🌳</span>
-            <span>Hotels & Parks Along Route</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-primary/10 text-primary font-extrabold">
-              {intermediatePlaces.length}
-            </span>
+  return (
+    <div className="min-h-screen bg-background text-foreground pb-24 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-7 sm:space-y-9">
+        {/* 1. Page Header & Status Bar */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border/80">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-quantum-500/15 text-quantum-700 dark:text-quantum-300 border border-quantum-500/30">
+                QIGA Metaheuristic Routing
+              </span>
+              <span className="text-xs text-muted-foreground">•</span>
+              <span className="text-xs text-muted-foreground font-medium">
+                Multi-Objective Corridor Optimization
+              </span>
+            </div>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-foreground tracking-tight">
+              Traffic Route Optimization & Corridor Navigation
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+              Real-time congestion avoidance, powertrain fuel consumption, carbon emissions, and intermediate stays & recreation along route.
+            </p>
           </div>
-          {showPlacesSection ? (
-            <ChevronUp className="h-4 w-4 text-quantum-600 dark:text-quantum-400" />
-          ) : (
-            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-          )}
-        </button>
 
-        {showPlacesSection && (
-          <div className="mt-3 p-3 rounded-2xl bg-card border border-border space-y-3 transition-all">
-            {/* Filter Tabs */}
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-muted border border-border text-xs">
+          {/* Telemetry badges */}
+          <div className="flex items-center gap-2 flex-wrap text-xs">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-card border border-border shadow-xs">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-semibold text-foreground">Traffic Engine:</span>
+              <span className="text-muted-foreground font-medium">Live OSRM</span>
+            </div>
+            {fuelInfo && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-card border border-border shadow-xs">
+                <span className="text-quantum-600 dark:text-quantum-400 font-bold">₹</span>
+                <span className="font-semibold text-foreground">Petrol:</span>
+                <span className="text-muted-foreground font-medium">₹{fuelInfo.petrol.toFixed(1)}/L</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 2. Route Planning Console Card (Spacious, unified control panel) */}
+        <div className="bg-card border border-border rounded-3xl p-4 sm:p-6 shadow-md space-y-4 sm:space-y-5">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-border/60">
+            {/* Powertrain selector */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider mr-1">Vehicle:</span>
+              {[
+                { id: 'petrol', label: 'Petrol', icon: '⛽' },
+                { id: 'diesel', label: 'Diesel', icon: '🛢️' },
+                { id: 'cng', label: 'CNG', icon: '🌱' },
+                { id: 'ev', label: 'Electric EV', icon: '⚡' },
+              ].map((v) => (
+                <button
+                  key={v.id}
+                  type="button"
+                  onClick={() => setVehicleType(v.id as VehicleType)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    vehicleType === v.id
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'bg-muted/70 text-muted-foreground hover:text-foreground hover:bg-muted'
+                  }`}
+                >
+                  <span>{v.icon}</span>
+                  <span>{v.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Objective selector */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider mr-1">Objective:</span>
+              {[
+                { id: 'balanced', label: 'Balanced ⚖️' },
+                { id: 'fastest', label: 'Fastest ⚡' },
+                { id: 'cheapest', label: 'Cheapest 💰' },
+                { id: 'eco', label: 'Eco-Friendly 🌿' },
+                { id: 'shortest', label: 'Shortest 📏' },
+              ].map((obj) => (
+                <button
+                  key={obj.id}
+                  type="button"
+                  onClick={() => setObjective(obj.id as OptimizationObjective)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
+                    objective === obj.id
+                      ? 'bg-quantum-500/20 text-quantum-700 dark:text-quantum-300 border border-quantum-500/40 font-bold'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  }`}
+                >
+                  {obj.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Primary Inputs Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+            {/* Origin Input (5 cols on md) */}
+            <div className="md:col-span-5 relative">
+              <div className="absolute left-3.5 top-3.5 h-3 w-3 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20" />
+              <input
+                type="text"
+                value={originQuery}
+                onChange={(e) => handleOriginSearch(e.target.value)}
+                placeholder="Departure location (e.g. Koramangala, Connaught Place)..."
+                className="w-full pl-10 pr-10 py-3 rounded-2xl text-xs sm:text-sm bg-background border border-border text-foreground font-medium focus:outline-hidden focus:ring-2 focus:ring-quantum-500/40 shadow-xs"
+              />
+              <button
+                type="button"
+                onClick={handleGeolocation}
+                title="Use Current GPS"
+                className="absolute right-3 top-3 p-1 text-muted-foreground hover:text-quantum-600 transition-colors"
+              >
+                <Compass className="h-4 w-4" />
+              </button>
+
+              {originSuggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border rounded-2xl shadow-xl z-50 max-h-52 overflow-y-auto">
+                  {originSuggestions.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setOrigin({ lat: item.lat, lng: item.lng, label: item.name });
+                        setOriginQuery(item.name);
+                        setOriginSuggestions([]);
+                      }}
+                      className="w-full text-left px-3.5 py-2.5 text-xs hover:bg-muted border-b border-border/50 last:border-0"
+                    >
+                      <p className="font-bold text-foreground truncate">{item.name}</p>
+                      <p className="text-[10px] text-muted-foreground line-clamp-1">{item.displayName}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Swap Button (1 col or centered) */}
+            <div className="md:col-span-1 flex justify-center">
+              <button
+                type="button"
+                onClick={swapEndpoints}
+                title="Swap Origin and Destination"
+                className="p-2.5 rounded-xl bg-muted hover:bg-muted/80 text-foreground transition-all hover:scale-110 active:scale-95 shadow-xs"
+              >
+                <ArrowUpDown className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Destination Input (4 cols on md) */}
+            <div className="md:col-span-4 relative">
+              <div className="absolute left-3.5 top-3.5 h-3 w-3 rounded-full bg-rose-500 ring-4 ring-rose-500/20" />
+              <input
+                type="text"
+                value={destQuery}
+                onChange={(e) => handleDestSearch(e.target.value)}
+                placeholder="Destination location (e.g. Whitefield, Cyber City)..."
+                className="w-full pl-10 pr-3.5 py-3 rounded-2xl text-xs sm:text-sm bg-background border border-border text-foreground font-medium focus:outline-hidden focus:ring-2 focus:ring-quantum-500/40 shadow-xs"
+              />
+
+              {destSuggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border rounded-2xl shadow-xl z-50 max-h-52 overflow-y-auto">
+                  {destSuggestions.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setDestination({ lat: item.lat, lng: item.lng, label: item.name });
+                        setDestQuery(item.name);
+                        setDestSuggestions([]);
+                      }}
+                      className="w-full text-left px-3.5 py-2.5 text-xs hover:bg-muted border-b border-border/50 last:border-0"
+                    >
+                      <p className="font-bold text-foreground truncate">{item.name}</p>
+                      <p className="text-[10px] text-muted-foreground line-clamp-1">{item.displayName}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Find Best Route CTA (2 cols on md) */}
+            <div className="md:col-span-2">
+              <button
+                type="button"
+                onClick={() => fetchRouteData()}
+                disabled={isLoadingRoutes}
+                className="w-full min-h-[46px] flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-bold text-xs sm:text-sm bg-primary text-primary-foreground hover:bg-primary/90 shadow-md transition-all active:scale-95 disabled:opacity-50"
+              >
+                {isLoadingRoutes ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    <span>Optimizing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 text-quantum-300" />
+                    <span>Find Best Route</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Waypoints row & Custom Stop addition */}
+          <div className="flex items-center justify-between pt-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <button
+                type="button"
+                onClick={addIntermediateStop}
+                disabled={stops.length >= 3}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-quantum-600 dark:text-quantum-400 hover:underline disabled:opacity-40"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Add Custom Stop {stops.length > 0 ? `(${stops.length}/3)` : ''}</span>
+              </button>
+              <span className="text-xs text-muted-foreground hidden sm:inline">•</span>
+              <span className="text-xs text-muted-foreground hidden sm:inline">
+                You can also add any Hotel 🏨 or Park 🌳 below directly into your route!
+              </span>
+            </div>
+          </div>
+
+          {/* Configured Waypoints List */}
+          {stops.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 pt-1">
+              {stops.map((stop, sIdx) => (
+                <div key={stop.id} className="relative">
+                  <div className="absolute left-3 top-3 h-2.5 w-2.5 rounded-full bg-amber-500 ring-2 ring-amber-500/20" />
+                  <input
+                    type="text"
+                    value={stop.query}
+                    onChange={(e) => handleStopSearch(sIdx, e.target.value)}
+                    placeholder={`Stop #${sIdx + 1}...`}
+                    className="w-full pl-8 pr-8 py-2 rounded-xl text-xs bg-background border border-border text-foreground font-medium"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeIntermediateStop(sIdx)}
+                    className="absolute right-2.5 top-2.5 p-1 text-muted-foreground hover:text-rose-500 transition-colors"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                  {stop.suggestions.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-50 max-h-44 overflow-y-auto">
+                      {stop.suggestions.map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => selectStopLocation(sIdx, item)}
+                          className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/50 last:border-0"
+                        >
+                          <p className="font-semibold text-foreground truncate">{item.name}</p>
+                          <p className="text-[10px] text-muted-foreground line-clamp-1">{item.displayName}</p>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 3. Interactive Map (Full-width, expansive responsive canvas) */}
+        <div className="relative w-full h-[460px] sm:h-[520px] lg:h-[600px] rounded-3xl overflow-hidden shadow-xl border border-border">
+          {/* Floating Top Journey HUD */}
+          {selectedRoute && (
+            <div className="absolute top-3 left-3 right-3 sm:right-auto z-20 pointer-events-none flex flex-wrap items-center gap-2">
+              <div className="pointer-events-auto bg-card/95 backdrop-blur-md border border-border shadow-md rounded-2xl px-3.5 py-2 flex items-center gap-2 sm:gap-3 text-xs font-semibold max-w-full overflow-x-auto no-scrollbar">
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="font-bold text-foreground truncate max-w-[120px] sm:max-w-[200px]">
+                    {selectedRoute.name}
+                  </span>
+                </div>
+                <div className="h-3.5 w-px bg-border shrink-0" />
+                <div className="text-muted-foreground shrink-0 whitespace-nowrap">
+                  ETA: <strong className="text-foreground">{formatDuration(selectedRoute.durationMin)}</strong>
+                </div>
+                <div className="h-3.5 w-px bg-border shrink-0" />
+                <div className="text-muted-foreground shrink-0 whitespace-nowrap">
+                  Dist: <strong className="text-foreground">{formatDistance(selectedRoute.distanceKm)}</strong>
+                </div>
+                <div className="h-3.5 w-px bg-border shrink-0" />
+                <div className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0 whitespace-nowrap">
+                  {formatCurrency(selectedRoute.fuelCostInr)}
+                </div>
+              </div>
+
+              {/* Layer toggles */}
+              <div className="pointer-events-auto flex items-center gap-1 bg-card/95 backdrop-blur-md border border-border px-2 py-1 rounded-2xl shadow-xs text-xs">
+                <button
+                  type="button"
+                  onClick={() => setShowIntermediatePlaces(!showIntermediatePlaces)}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-semibold transition-colors ${
+                    showIntermediatePlaces
+                      ? 'bg-purple-500/15 text-purple-700 dark:text-purple-300 font-bold'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  title="Toggle Hotels & Parks Along Route"
+                >
+                  <span>🏨🌳</span>
+                  <span>Places ({filteredPlaces.length})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowEVChargers(!showEVChargers)}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-semibold transition-colors ${
+                    showEVChargers
+                      ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  title="Toggle EV Hubs"
+                >
+                  <BatteryCharging className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">EV Hubs ({chargingStations.length})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowTrafficFlow(!showTrafficFlow)}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-semibold transition-colors ${
+                    showTrafficFlow
+                      ? 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 font-bold'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  title="Toggle Traffic Flow"
+                >
+                  <Wind className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Flow</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Map Canvas */}
+          <div className="w-full h-full">
+            <MapWrapper
+              center={origin}
+              zoom={12}
+              origin={origin}
+              destination={destination}
+              stops={stops.filter((s) => s.lat && s.lng).map((s) => ({ id: s.id, lat: s.lat, lng: s.lng, label: s.label || s.query }))}
+              routes={routes}
+              selectedRouteId={selectedRouteId}
+              onSelectRoute={(id) => {
+                setSelectedRouteId(id);
+                const chosen = routes.find((r) => r.id === id);
+                if (chosen) {
+                  fetchPlacesAlongRoute(origin, destination, chosen.coordinates || []);
+                }
+              }}
+              incidents={incidents}
+              showIncidents={true}
+              chargingStations={chargingStations}
+              showChargingStations={showEVChargers}
+              showTrafficFlow={showTrafficFlow}
+              tomtomTrafficTileUrl={tomtomTileUrl}
+              intermediatePlaces={filteredPlaces}
+              showIntermediatePlaces={showIntermediatePlaces}
+              onAddPlaceAsStop={handleAddPlaceAsStop}
+            />
+          </div>
+        </div>
+
+        {/* 4. Section: Route Alternatives & Rankings (Side-by-side Cards Grid) */}
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h2 className="text-lg sm:text-xl font-extrabold text-foreground flex items-center gap-2">
+                <Navigation className="h-5 w-5 text-quantum-600 dark:text-quantum-400" />
+                <span>Recommended Route & Alternatives</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">
+                  {routes.length} Available
+                </span>
+              </h2>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+                Evaluated against real traffic congestion, road topology, and vehicle powertrain models.
+              </p>
+            </div>
+
+            {selectedRoute && (
+              <button
+                type="button"
+                onClick={handleSaveRoute}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-muted hover:bg-muted/80 text-foreground transition-all shadow-xs shrink-0 self-start sm:self-auto"
+              >
+                {isSavedSuccessfully ? (
+                  <>
+                    <Check className="h-4 w-4 text-emerald-500" />
+                    <span className="text-emerald-600 dark:text-emerald-400">Route Saved!</span>
+                  </>
+                ) : (
+                  <>
+                    <BookmarkPlus className="h-4 w-4 text-quantum-600 dark:text-quantum-400" />
+                    <span>Bookmark Route</span>
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+
+          {/* Loading Skeletons */}
+          {isLoadingRoutes && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="p-5 rounded-2xl border border-border bg-card space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="h-4 w-32 rounded-md skeleton-shimmer" />
+                    <div className="h-4 w-16 rounded-full skeleton-shimmer" />
+                  </div>
+                  <div className="h-3 w-48 rounded-md skeleton-shimmer" />
+                  <div className="grid grid-cols-4 gap-2 pt-2">
+                    {[1, 2, 3, 4].map((j) => (
+                      <div key={j} className="h-10 rounded-xl skeleton-shimmer" />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Route Cards Responsive Grid */}
+          {!isLoadingRoutes && routes.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {routes.map((route) => (
+                <RouteCard
+                  key={route.id}
+                  route={route}
+                  isSelected={route.id === selectedRouteId}
+                  onSelect={() => {
+                    setSelectedRouteId(route.id);
+                    fetchPlacesAlongRoute(origin, destination, route.coordinates || []);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* 5. Section: Intermediate Places Along Route (Hotels 🏨 & Parks 🌳 in a Wide Responsive Grid) */}
+        <div className="bg-card border border-border rounded-3xl p-5 sm:p-7 shadow-md space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/60">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xl">🏨🌳</span>
+                <h2 className="text-lg sm:text-xl font-extrabold text-foreground">
+                  Places in Between (Hotels & Parks)
+                </h2>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-700 dark:text-purple-300 font-extrabold border border-purple-500/20">
+                  {intermediatePlaces.length} En-Route
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Hotels, resorts, botanical gardens, and recreation spaces situated along your selected corridor (&le; 4.5 km off path). Tap &quot;+ Add Stop&quot; to divert seamlessly.
+              </p>
+            </div>
+
+            {/* Filter Pills */}
+            <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-muted border border-border text-xs shrink-0">
               <button
                 type="button"
                 onClick={() => setPlaceFilter('all')}
-                className={`flex-1 py-1 rounded-lg text-[11px] font-bold transition-all text-center ${
+                className={`px-3 py-1.5 rounded-xl font-bold transition-all text-center ${
                   placeFilter === 'all'
                     ? 'bg-primary text-primary-foreground shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
@@ -571,7 +997,7 @@ function DashboardContent() {
               <button
                 type="button"
                 onClick={() => setPlaceFilter('hotel')}
-                className={`flex-1 py-1 rounded-lg text-[11px] font-bold transition-all text-center flex items-center justify-center gap-1 ${
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-xl font-bold transition-all text-center ${
                   placeFilter === 'hotel'
                     ? 'bg-purple-600 text-white shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
@@ -583,7 +1009,7 @@ function DashboardContent() {
               <button
                 type="button"
                 onClick={() => setPlaceFilter('park')}
-                className={`flex-1 py-1 rounded-lg text-[11px] font-bold transition-all text-center flex items-center justify-center gap-1 ${
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-xl font-bold transition-all text-center ${
                   placeFilter === 'park'
                     ? 'bg-emerald-600 text-white shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
@@ -593,105 +1019,87 @@ function DashboardContent() {
                 <span>Parks ({parkCount})</span>
               </button>
             </div>
+          </div>
 
-            {/* Loading state */}
-            {isLoadingPlaces && (
-              <div className="space-y-2 py-2">
-                {[1, 2].map((i) => (
-                  <div key={i} className="p-3 rounded-xl border border-border/70 space-y-2">
-                    <div className="h-3 w-28 rounded-md skeleton-shimmer" />
-                    <div className="h-2.5 w-44 rounded-md skeleton-shimmer" />
-                  </div>
-                ))}
-              </div>
-            )}
+          {/* Loading */}
+          {isLoadingPlaces && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="p-4 rounded-2xl border border-border/70 space-y-2.5">
+                  <div className="h-4 w-28 rounded-md skeleton-shimmer" />
+                  <div className="h-3 w-40 rounded-md skeleton-shimmer" />
+                  <div className="h-8 rounded-xl skeleton-shimmer mt-2" />
+                </div>
+              ))}
+            </div>
+          )}
 
-            {/* Empty state */}
-            {!isLoadingPlaces && filteredPlaces.length === 0 && (
-              <div className="p-4 text-center text-xs text-muted-foreground bg-muted/40 rounded-xl border border-dashed border-border">
-                No {placeFilter === 'hotel' ? 'hotels' : placeFilter === 'park' ? 'parks' : 'places'} found within corridor range.
-              </div>
-            )}
+          {/* Empty state */}
+          {!isLoadingPlaces && filteredPlaces.length === 0 && (
+            <div className="p-8 text-center rounded-2xl bg-muted/30 border border-dashed border-border space-y-2">
+              <p className="text-sm font-bold text-foreground">No places matching filter</p>
+              <p className="text-xs text-muted-foreground">
+                No intermediate {placeFilter === 'hotel' ? 'hotels' : placeFilter === 'park' ? 'parks' : 'places'} found directly adjacent to this corridor.
+              </p>
+            </div>
+          )}
 
-            {/* List of Places */}
-            {!isLoadingPlaces && filteredPlaces.length > 0 && (
-              <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-                {filteredPlaces.map((place) => {
-                  const isAlreadyStop = stops.some(
-                    (s) => Math.abs(s.lat - place.lat) < 0.001 && Math.abs(s.lng - place.lng) < 0.001
-                  );
+          {/* Places Grid: 4 columns on large screens, 3 on tablets/laptops, 2 on small tablets, 1 on mobile */}
+          {!isLoadingPlaces && filteredPlaces.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filteredPlaces.map((place) => {
+                const isAlreadyStop = stops.some(
+                  (s) => Math.abs(s.lat - place.lat) < 0.001 && Math.abs(s.lng - place.lng) < 0.001
+                );
 
-                  return (
-                    <div
-                      key={place.id}
-                      className="p-3 rounded-xl border border-border bg-muted/30 hover:bg-muted/60 transition-colors space-y-2 text-xs"
-                    >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-start gap-2 flex-1 min-w-0">
-                          <span
-                            className={`h-7 w-7 rounded-lg text-sm flex items-center justify-center shrink-0 border ${
-                              place.category === 'hotel'
-                                ? 'bg-purple-100 dark:bg-purple-950/60 border-purple-200 dark:border-purple-800'
-                                : place.category === 'park'
-                                ? 'bg-emerald-100 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800'
-                                : 'bg-amber-100 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800'
-                            }`}
-                          >
-                            {place.category === 'hotel' ? '🏨' : place.category === 'park' ? '🌳' : '☕'}
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="font-bold text-foreground truncate">{place.name}</span>
-                              {place.rating && (
-                                <span className="text-[10px] font-bold text-amber-500 flex items-center gap-0.5">
-                                  ★ {place.rating.toFixed(1)}
-                                </span>
-                              )}
-                            </div>
-                            {place.address && (
-                              <p className="text-[11px] text-muted-foreground truncate">{place.address}</p>
-                            )}
-                            {place.distanceFromRouteKm !== undefined && (
-                              <span className="text-[10px] text-quantum-600 dark:text-quantum-400 font-semibold block mt-0.5">
-                                📍 {place.distanceFromRouteKm.toFixed(1)} km off corridor
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Add stop button */}
-                        <button
-                          type="button"
-                          onClick={() => handleAddPlaceAsStop(place)}
-                          disabled={isAlreadyStop || stops.length >= 3}
-                          className={`shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1 min-h-[32px] sm:min-h-[28px] ${
-                            isAlreadyStop
-                              ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
-                              : 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs active:scale-95'
-                          } disabled:opacity-50`}
-                          title={isAlreadyStop ? 'Already added as a stop' : 'Add as stop to route'}
+                return (
+                  <div
+                    key={place.id}
+                    className="group relative p-4 rounded-2xl border border-border bg-card hover:border-quantum-500/50 hover:shadow-md transition-all flex flex-col justify-between space-y-3"
+                  >
+                    <div className="space-y-2">
+                      {/* Header badge & rating */}
+                      <div className="flex items-center justify-between gap-2">
+                        <span
+                          className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md flex items-center gap-1 ${
+                            place.category === 'hotel'
+                              ? 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
+                              : place.category === 'park'
+                              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                              : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                          }`}
                         >
-                          {isAlreadyStop ? (
-                            <>
-                              <Check className="h-3 w-3" />
-                              <span>Added</span>
-                            </>
-                          ) : (
-                            <>
-                              <Plus className="h-3 w-3" />
-                              <span>Stop</span>
-                            </>
-                          )}
-                        </button>
+                          <span>{place.category === 'hotel' ? '🏨 Hotel' : place.category === 'park' ? '🌳 Park' : '☕ Rest Stop'}</span>
+                        </span>
+
+                        {place.rating && (
+                          <span className="text-xs font-extrabold text-amber-500 flex items-center gap-0.5">
+                            ★ {place.rating.toFixed(1)}
+                          </span>
+                        )}
                       </div>
 
-                      {/* Amenities tags */}
+                      <div>
+                        <h3 className="font-bold text-sm text-foreground group-hover:text-quantum-600 dark:group-hover:text-quantum-400 transition-colors line-clamp-1" title={place.name}>
+                          {place.name}
+                        </h3>
+                        {place.address && (
+                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{place.address}</p>
+                        )}
+                      </div>
+
+                      {place.distanceFromRouteKm !== undefined && (
+                        <span className="inline-block text-[11px] text-quantum-600 dark:text-quantum-400 font-semibold bg-quantum-500/10 px-2 py-0.5 rounded-md">
+                          📍 {place.distanceFromRouteKm.toFixed(1)} km off corridor
+                        </span>
+                      )}
+
                       {place.amenities && place.amenities.length > 0 && (
-                        <div className="flex flex-wrap gap-1 pt-1 border-t border-border/40">
+                        <div className="flex flex-wrap gap-1 pt-1">
                           {place.amenities.slice(0, 3).map((amenity, aIdx) => (
                             <span
                               key={aIdx}
-                              className="text-[9px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-medium"
+                              className="text-[10px] px-2 py-0.5 rounded-md bg-muted text-muted-foreground font-medium"
                             >
                               {amenity}
                             </span>
@@ -699,582 +1107,131 @@ function DashboardContent() {
                         </div>
                       )}
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    );
-  };
 
-  // Primary input form controls
-  const renderRouteInputs = () => (
-    <div className="space-y-3">
-      {/* Vehicle Type Selector Pills */}
-      <div className="flex items-center gap-1.5 p-1 rounded-xl bg-muted border border-border">
-        {[
-          { id: 'petrol', label: 'Petrol' },
-          { id: 'diesel', label: 'Diesel' },
-          { id: 'cng', label: 'CNG' },
-          { id: 'ev', label: 'Electric (EV)' },
-        ].map((v) => (
-          <button
-            key={v.id}
-            type="button"
-            onClick={() => setVehicleType(v.id as VehicleType)}
-            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all text-center ${
-              vehicleType === v.id
-                ? 'bg-primary text-primary-foreground shadow-xs'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            {v.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Origin & Destination Container */}
-      <div className="space-y-2 relative">
-        {/* Origin Input */}
-        <div className="relative">
-          <div className="absolute left-3 top-3 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20" />
-          <input
-            type="text"
-            value={originQuery}
-            onChange={(e) => handleOriginSearch(e.target.value)}
-            placeholder="Starting location..."
-            className="w-full pl-9 pr-9 py-2.5 rounded-xl text-xs sm:text-sm bg-background border border-border text-foreground focus:outline-hidden focus:ring-2 focus:ring-quantum-500/40"
-          />
-          <button
-            type="button"
-            onClick={handleGeolocation}
-            title="Use Current GPS"
-            className="absolute right-2.5 top-2.5 p-1 text-muted-foreground hover:text-quantum-600 transition-colors"
-          >
-            <Compass className="h-4 w-4" />
-          </button>
-
-          {/* Autocomplete */}
-          {originSuggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-50 max-h-52 overflow-y-auto">
-              {originSuggestions.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => {
-                    setOrigin({ lat: item.lat, lng: item.lng, label: item.name });
-                    setOriginQuery(item.name);
-                    setOriginSuggestions([]);
-                  }}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/50 last:border-0"
-                >
-                  <p className="font-semibold text-foreground truncate">{item.name}</p>
-                  <p className="text-[10px] text-muted-foreground line-clamp-1">{item.displayName}</p>
-                </button>
-              ))}
+                    {/* Add Stop Button */}
+                    <div className="pt-2 border-t border-border/50">
+                      <button
+                        type="button"
+                        onClick={() => handleAddPlaceAsStop(place)}
+                        disabled={isAlreadyStop || stops.length >= 3}
+                        className={`w-full py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                          isAlreadyStop
+                            ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+                            : 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs active:scale-95'
+                        } disabled:opacity-50`}
+                      >
+                        {isAlreadyStop ? (
+                          <>
+                            <Check className="h-3.5 w-3.5" />
+                            <span>Waypoint Added</span>
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="h-3.5 w-3.5" />
+                            <span>Add as Waypoint Stop</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
 
-        {/* Swap & Waypoints Toggle Row */}
-        <div className="flex items-center justify-between px-1">
-          <button
-            type="button"
-            onClick={addIntermediateStop}
-            disabled={stops.length >= 3}
-            className="text-[11px] font-semibold text-quantum-600 dark:text-quantum-400 hover:underline disabled:opacity-40"
-          >
-            + Add Stop {stops.length > 0 ? `(${stops.length}/3)` : ''}
-          </button>
+        {/* 6. Section: Turn-by-Turn Guidance & Fleet Telemetry */}
+        {selectedRoute && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Turn-by-Turn Guidance (7 cols) */}
+            <div className="lg:col-span-7 bg-card border border-border rounded-3xl p-5 sm:p-6 shadow-md space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-border/60">
+                <h3 className="font-extrabold text-base sm:text-lg text-foreground flex items-center gap-2">
+                  <Navigation className="h-4 w-4 text-quantum-600 dark:text-quantum-400" />
+                  <span>Turn-by-Turn Driving Directions</span>
+                </h3>
+                <span className="text-xs text-muted-foreground font-semibold">
+                  {selectedRoute.instructions?.length || 0} maneuvers
+                </span>
+              </div>
 
-          <button
-            type="button"
-            onClick={swapEndpoints}
-            title="Swap Origin and Destination"
-            className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-muted text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowUpDown className="h-3 w-3" />
-            <span>Swap</span>
-          </button>
-        </div>
-
-        {/* Waypoints List */}
-        {stops.map((stop, sIdx) => (
-          <div key={stop.id} className="relative">
-            <div className="absolute left-3 top-3 h-2.5 w-2.5 rounded-full bg-amber-500 ring-2 ring-amber-500/20" />
-            <input
-              type="text"
-              value={stop.query}
-              onChange={(e) => handleStopSearch(sIdx, e.target.value)}
-              placeholder={`Stop ${sIdx + 1}...`}
-              className="w-full pl-9 pr-9 py-2 rounded-xl text-xs bg-background border border-border text-foreground focus:outline-hidden focus:ring-1 focus:ring-amber-500"
-            />
-            <button
-              type="button"
-              onClick={() => removeIntermediateStop(sIdx)}
-              className="absolute right-2.5 top-2.5 p-1 text-muted-foreground hover:text-rose-500 transition-colors"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-            {stop.suggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-50 max-h-44 overflow-y-auto">
-                {stop.suggestions.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => selectStopLocation(sIdx, item)}
-                    className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/50 last:border-0"
-                  >
-                    <p className="font-semibold text-foreground truncate">{item.name}</p>
-                    <p className="text-[10px] text-muted-foreground line-clamp-1">{item.displayName}</p>
-                  </button>
+              <div className="space-y-3 max-h-[380px] overflow-y-auto pr-2">
+                {selectedRoute.instructions?.map((step, idx) => (
+                  <div key={idx} className="flex items-start gap-3 p-3 rounded-2xl bg-muted/40 hover:bg-muted/70 transition-colors border border-border/40 text-xs sm:text-sm">
+                    <span className="h-6 w-6 rounded-full bg-quantum-500/15 text-quantum-700 dark:text-quantum-300 font-extrabold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                      {idx + 1}
+                    </span>
+                    <div className="flex-1">
+                      <p className="font-semibold text-foreground leading-snug">{step.text}</p>
+                      <span className="text-xs text-muted-foreground font-medium block mt-1">
+                        {formatDistance(step.distanceKm)} • {formatDuration(step.durationMin)}
+                      </span>
+                    </div>
+                  </div>
                 ))}
               </div>
-            )}
-          </div>
-        ))}
-
-        {/* Destination Input */}
-        <div className="relative">
-          <div className="absolute left-3 top-3 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-rose-500/20" />
-          <input
-            type="text"
-            value={destQuery}
-            onChange={(e) => handleDestSearch(e.target.value)}
-            placeholder="Destination location..."
-            className="w-full pl-9 pr-9 py-2.5 rounded-xl text-xs sm:text-sm bg-background border border-border text-foreground focus:outline-hidden focus:ring-2 focus:ring-quantum-500/40"
-          />
-
-          {/* Autocomplete */}
-          {destSuggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-50 max-h-52 overflow-y-auto">
-              {destSuggestions.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => {
-                    setDestination({ lat: item.lat, lng: item.lng, label: item.name });
-                    setDestQuery(item.name);
-                    setDestSuggestions([]);
-                  }}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/50 last:border-0"
-                >
-                  <p className="font-semibold text-foreground truncate">{item.name}</p>
-                  <p className="text-[10px] text-muted-foreground line-clamp-1">{item.displayName}</p>
-                </button>
-              ))}
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Primary CTA Button */}
-      <button
-        type="button"
-        onClick={() => fetchRouteData()}
-        disabled={isLoadingRoutes}
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-all disabled:opacity-50"
-      >
-        {isLoadingRoutes ? (
-          <>
-            <RefreshCw className="h-4 w-4 animate-spin" />
-            <span>Optimizing Corridors...</span>
-          </>
-        ) : (
-          <>
-            <Sparkles className="h-4 w-4 text-quantum-300" />
-            <span>Find Best Route</span>
-          </>
-        )}
-      </button>
-    </div>
-  );
+            {/* Fleet Telemetry & Weather Overview (5 cols) */}
+            <div className="lg:col-span-5 space-y-4">
+              {/* Powertrain summary */}
+              <div className="bg-card border border-border rounded-3xl p-5 shadow-md space-y-4">
+                <h3 className="font-extrabold text-base text-foreground flex items-center gap-2">
+                  <span>⚡</span>
+                  <span>Powertrain & Environmental Impact</span>
+                </h3>
 
-  return (
-    <div className="relative flex flex-col md:flex-row h-[calc(100vh-3.5rem)] overflow-hidden bg-background">
-      {/* DESKTOP SIDE PANEL (Compact, Uncluttered, Maximize Map, Collapsible on Tablet/Desktop) */}
-      <div className={`hidden ${isSidebarCollapsed ? 'md:hidden' : 'md:flex'} w-[340px] lg:w-[380px] xl:w-[420px] flex-col h-full bg-card border-r border-border shrink-0 z-20 overflow-hidden shadow-sm transition-all duration-300`}>
-        {/* Top Input Section - Fixed in place while route cards scroll underneath */}
-        <div className="p-4 border-b border-border shrink-0 bg-card z-10 shadow-xs">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-                <Navigation className="h-4 w-4 text-quantum-600 dark:text-quantum-400" />
-                Route Navigation
-              </h2>
-              <span className="text-[10px] font-semibold text-muted-foreground px-1.5 py-0.5 rounded bg-muted">
-                QIGA Engine
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsSidebarCollapsed(true)}
-              title="Collapse sidebar for full map view"
-              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-              aria-label="Collapse sidebar"
-            >
-              <PanelLeftClose className="h-4 w-4" />
-            </button>
-          </div>
-
-          {renderRouteInputs()}
-        </div>
-
-        {/* Route Alternatives List - Independently Scrollable Container */}
-        <div className="flex-1 overflow-y-auto min-h-0 p-4 space-y-3">
-          <div className="flex items-center justify-between text-xs text-muted-foreground font-semibold">
-            <span>Route Alternatives ({routes.length})</span>
-            {selectedRoute && (
-              <button
-                type="button"
-                onClick={handleSaveRoute}
-                className="inline-flex items-center gap-1 text-quantum-600 dark:text-quantum-400 hover:underline"
-              >
-                {isSavedSuccessfully ? (
-                  <>
-                    <Check className="h-3.5 w-3.5 text-emerald-500" /> Saved!
-                  </>
-                ) : (
-                  <>
-                    <BookmarkPlus className="h-3.5 w-3.5" /> Save
-                  </>
-                )}
-              </button>
-            )}
-          </div>
-
-          {/* Loading Skeleton */}
-          {isLoadingRoutes && (
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="p-4 rounded-2xl border border-border bg-card space-y-2.5"
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="h-4 w-28 rounded-md skeleton-shimmer" />
-                    <div className="h-4 w-14 rounded-full skeleton-shimmer" />
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="p-3.5 rounded-2xl bg-muted/50 border border-border">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block">
+                      Energy / Fuel
+                    </span>
+                    <span className="text-lg font-black text-foreground block mt-1">
+                      {selectedRoute.energyUsedUnits} units
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">Estimated consumption</span>
                   </div>
-                  <div className="h-3 w-40 rounded-md skeleton-shimmer" />
-                  <div className="grid grid-cols-4 gap-1.5 pt-2">
-                    {[1, 2, 3, 4].map((j) => (
-                      <div key={j} className="h-8 rounded-lg skeleton-shimmer" />
-                    ))}
+
+                  <div className="p-3.5 rounded-2xl bg-muted/50 border border-border">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block">
+                      Carbon Footprint
+                    </span>
+                    <span className="text-lg font-black text-emerald-600 dark:text-emerald-400 block mt-1">
+                      {formatEmissions(selectedRoute.emissionsKg)}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">CO₂ emissions</span>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
 
-          {/* Empty State */}
-          {!isLoadingRoutes && routes.length === 0 && (
-            <div className="p-6 text-center rounded-2xl bg-muted/30 border border-dashed border-border space-y-2">
-              <Navigation className="h-6 w-6 text-muted-foreground mx-auto" />
-              <p className="font-bold text-foreground text-sm">No Corridors Found</p>
-              <p className="text-xs text-muted-foreground">
-                Unable to route between the selected endpoints. Please check the locations and try again.
-              </p>
-              <button
-                type="button"
-                onClick={() => fetchRouteData()}
-                className="mt-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
-              >
-                Retry Search
-              </button>
-            </div>
-          )}
+              {/* Weather & Air Quality */}
+              <div className="bg-card border border-border rounded-3xl p-5 shadow-md space-y-3">
+                <h3 className="font-extrabold text-sm text-foreground flex items-center gap-2">
+                  <span>🌦️</span>
+                  <span>Atmospheric Conditions</span>
+                </h3>
 
-          {/* Render Route Alternative Cards */}
-          {!isLoadingRoutes &&
-            routes.map((route) => (
-              <RouteCard
-                key={route.id}
-                route={route}
-                isSelected={route.id === selectedRouteId}
-                onSelect={() => {
-                  setSelectedRouteId(route.id);
-                  fetchPlacesAlongRoute(origin, destination, route.coordinates || []);
-                }}
-              />
-            ))}
-
-          {/* Intermediate Places Along Route (Hotels & Parks) */}
-          {selectedRoute && !isLoadingRoutes && renderPlacesSection()}
-
-          {/* Expandable Turn-by-Turn Guidance & Fleet Analytics (Only shown when requested!) */}
-          {selectedRoute && !isLoadingRoutes && (
-            <div className="pt-2">
-              <button
-                type="button"
-                onClick={() => setShowAnalyticsDrawer(!showAnalyticsDrawer)}
-                className="w-full py-2.5 px-3 rounded-xl border border-border text-xs font-bold flex items-center justify-between text-foreground bg-muted hover:bg-muted/80 transition-colors"
-              >
-                <span>Turn-by-Turn Guidance & Fleet Analytics</span>
-                {showAnalyticsDrawer ? (
-                  <ChevronUp className="h-4 w-4 text-quantum-600 dark:text-quantum-400" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                )}
-              </button>
-
-              {showAnalyticsDrawer && (
-                <div className="mt-3 p-3.5 rounded-2xl bg-card border border-border space-y-3 transition-all">
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
-                      Turn-by-Turn Guidance
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="p-3 rounded-2xl bg-muted/40 border border-border/60">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold block">Weather</span>
+                    <span className="font-extrabold text-foreground text-sm block mt-0.5">
+                      {weather ? `${Math.round(weather.temperatureC)}°C, ${weather.description}` : '24°C, Clear'}
                     </span>
-                    <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                      {selectedRoute.instructions?.map((step, idx) => (
-                        <div key={idx} className="flex items-start gap-2 text-xs">
-                          <span className="h-4 w-4 rounded-full bg-muted text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
-                            {idx + 1}
-                          </span>
-                          <div className="flex-1">
-                            <p className="text-foreground font-medium">{step.text}</p>
-                            <span className="text-[10px] text-muted-foreground">
-                              {formatDistance(step.distanceKm)} • {formatDuration(step.durationMin)}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <span className="text-[10px] text-muted-foreground">Humidity: {weather?.humidityPercent ?? 65}%</span>
                   </div>
 
-                  <div className="pt-2 border-t border-border text-xs space-y-1">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
-                      Powertrain Energy Summary
+                  <div className="p-3 rounded-2xl bg-muted/40 border border-border/60">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold block">Air Quality</span>
+                    <span className="font-extrabold text-foreground text-sm block mt-0.5">
+                      {airQuality ? `AQI ${airQuality.usAqi} (${airQuality.category})` : 'AQI 68 (Moderate)'}
                     </span>
-                    <div className="flex justify-between text-muted-foreground text-[11px]">
-                      <span>Estimated Fuel Consumption:</span>
-                      <strong className="text-foreground">{selectedRoute.energyUsedUnits} units</strong>
-                    </div>
-                    <div className="flex justify-between text-muted-foreground text-[11px]">
-                      <span>Estimated Carbon Footprint:</span>
-                      <strong className="text-foreground">{formatEmissions(selectedRoute.emissionsKg)}</strong>
-                    </div>
+                    <span className="text-[10px] text-muted-foreground">PM2.5: {airQuality?.pm25 ?? 18} µg/m³</span>
                   </div>
                 </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* FULL-SCREEN MAP CANVAS (The Main Focus) */}
-      <div className="flex-1 relative w-full h-full flex flex-col">
-        {/* Floating button to reopen sidebar on tablet/desktop when collapsed */}
-        {isSidebarCollapsed && (
-          <div className="hidden md:block absolute top-3 left-4 z-20 pointer-events-auto">
-            <button
-              type="button"
-              onClick={() => setIsSidebarCollapsed(false)}
-              className="bg-card/95 backdrop-blur-md border border-border shadow-md rounded-xl px-3 py-1.5 flex items-center gap-2 text-xs font-bold text-foreground hover:bg-muted transition-all hover:scale-105 active:scale-95 group"
-              title="Open Route Planning Panel"
-            >
-              <PanelLeftOpen className="h-4 w-4 text-quantum-600 dark:text-quantum-400 transition-transform group-hover:translate-x-0.5" />
-              <span>Plan Route</span>
-            </button>
-          </div>
-        )}
-
-        {/* Floating Top Journey HUD (Sleek, uncluttered, responsive pill) */}
-        {selectedRoute && (
-          <div className={`absolute top-3 left-3 right-3 md:right-auto z-20 pointer-events-none flex flex-wrap items-center gap-2 ${isSidebarCollapsed ? 'md:left-36' : 'md:left-4'}`}>
-            <div className="pointer-events-auto bg-card/95 backdrop-blur-md border border-border shadow-md rounded-xl px-3 py-1.5 flex items-center gap-2 sm:gap-3 text-xs font-semibold max-w-full overflow-x-auto no-scrollbar">
-              <div className="flex items-center gap-1.5 shrink-0">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
-                <span className="font-bold text-foreground truncate max-w-[110px] sm:max-w-[180px]">{selectedRoute.name}</span>
               </div>
-              <div className="h-3.5 w-px bg-border shrink-0" />
-              <div className="text-muted-foreground shrink-0 whitespace-nowrap">
-                ETA: <strong className="text-foreground">{formatDuration(selectedRoute.durationMin)}</strong>
-              </div>
-              <div className="h-3.5 w-px bg-border shrink-0 hidden sm:block" />
-              <div className="text-muted-foreground shrink-0 whitespace-nowrap hidden sm:block">
-                Dist: <strong className="text-foreground">{formatDistance(selectedRoute.distanceKm)}</strong>
-              </div>
-              <div className="h-3.5 w-px bg-border shrink-0" />
-              <div className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0 whitespace-nowrap">
-                {formatCurrency(selectedRoute.fuelCostInr)}
-              </div>
-            </div>
-
-            {/* Subtle layer toggles */}
-            <div className="pointer-events-auto flex items-center gap-1 bg-card/95 backdrop-blur-md border border-border px-2 py-1 rounded-xl shadow-xs text-xs">
-              <button
-                type="button"
-                onClick={() => setShowIntermediatePlaces(!showIntermediatePlaces)}
-                className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-colors ${
-                  showIntermediatePlaces
-                    ? 'bg-purple-500/15 text-purple-700 dark:text-purple-300'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-                title="Toggle Hotels & Parks Along Route"
-              >
-                <span>🏨🌳</span>
-                <span className="hidden sm:inline">Places ({filteredPlaces.length})</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowEVChargers(!showEVChargers)}
-                className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-colors ${
-                  showEVChargers
-                    ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-                title="Toggle EV Hubs"
-              >
-                <BatteryCharging className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">EV Hubs ({chargingStations.length})</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowTrafficFlow(!showTrafficFlow)}
-                className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-colors ${
-                  showTrafficFlow
-                    ? 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-                title="Toggle Traffic Flow"
-              >
-                <Wind className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Flow</span>
-              </button>
             </div>
           </div>
         )}
-
-        {/* Map Container */}
-        <div className="w-full h-full flex-1">
-          <MapWrapper
-            center={origin}
-            zoom={12}
-            origin={origin}
-            destination={destination}
-            stops={stops.filter((s) => s.lat && s.lng).map((s) => ({ id: s.id, lat: s.lat, lng: s.lng, label: s.label || s.query }))}
-            routes={routes}
-            selectedRouteId={selectedRouteId}
-            onSelectRoute={(id) => {
-              setSelectedRouteId(id);
-              const chosen = routes.find((r) => r.id === id);
-              if (chosen) {
-                fetchPlacesAlongRoute(origin, destination, chosen.coordinates || []);
-              }
-            }}
-            incidents={incidents}
-            showIncidents={true}
-            chargingStations={chargingStations}
-            showChargingStations={showEVChargers}
-            showTrafficFlow={showTrafficFlow}
-            tomtomTrafficTileUrl={tomtomTileUrl}
-            intermediatePlaces={filteredPlaces}
-            showIntermediatePlaces={showIntermediatePlaces}
-            onAddPlaceAsStop={handleAddPlaceAsStop}
-          />
-        </div>
-
-        {/* MOBILE DRAGGABLE BOTTOM ROUTE PANEL */}
-        <div
-          className={`md:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border shadow-2xl rounded-t-3xl transition-all duration-300 flex flex-col ${
-            isMobileSheetExpanded ? 'h-[85vh] max-h-[85vh]' : 'max-h-36 overflow-hidden'
-          }`}
-        >
-          {/* Draggable Handle */}
-          <button
-            type="button"
-            onClick={() => setIsMobileSheetExpanded(!isMobileSheetExpanded)}
-            className="w-full py-2.5 shrink-0 flex flex-col items-center cursor-pointer group"
-            aria-label="Toggle Route Panel"
-          >
-            <div className="w-12 h-1.5 rounded-full bg-muted-foreground/30 group-hover:bg-quantum-500 transition-colors" />
-            <div className="flex items-center gap-1 text-[11px] font-bold text-muted-foreground mt-1">
-              <span>{isMobileSheetExpanded ? 'Collapse Map View' : 'Slide Up for Route Details'}</span>
-              {isMobileSheetExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
-            </div>
-          </button>
-
-          {/* When collapsed on mobile, show quick one-line trip summary */}
-          {!isMobileSheetExpanded && selectedRoute && (
-            <div className="px-4 pb-4 pt-1">
-              <div className="flex items-center justify-between pb-1 gap-2 min-w-0">
-                <div className="min-w-0 flex-1">
-                  <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block">Selected Route</span>
-                  <p className="text-xs sm:text-sm font-bold text-foreground truncate">
-                    {selectedRoute.name}
-                  </p>
-                </div>
-                <div className="text-right shrink-0">
-                  <span className="text-base sm:text-lg font-extrabold text-quantum-600 dark:text-quantum-400 block leading-tight">
-                    {formatDuration(selectedRoute.durationMin)}
-                  </span>
-                  <p className="text-[10px] text-muted-foreground whitespace-nowrap">
-                    {formatDistance(selectedRoute.distanceKm)} • {formatCurrency(selectedRoute.fuelCostInr)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Full Expanded Mobile Panel: Fixed Inputs at Top + Scrollable Route Cards */}
-          {isMobileSheetExpanded && (
-            <>
-              {/* Fixed Inputs (Vehicle Selector, Source, Destination, CTA) */}
-              <div className="shrink-0 px-4 pb-3 border-b border-border/70 bg-card/95 backdrop-blur-md z-10">
-                {renderRouteInputs()}
-              </div>
-
-              {/* Scrollable Route Alternatives & Turn-by-Turn */}
-              <div className="flex-1 overflow-y-auto min-h-0 p-4 space-y-3">
-                <div className="space-y-2.5">
-                  <span className="text-xs font-bold text-foreground block">
-                    Route Alternatives ({routes.length})
-                  </span>
-
-                  {routes.map((route) => (
-                    <RouteCard
-                      key={route.id}
-                      route={route}
-                      isSelected={route.id === selectedRouteId}
-                      onSelect={() => {
-                        setSelectedRouteId(route.id);
-                        fetchPlacesAlongRoute(origin, destination, route.coordinates || []);
-                      }}
-                    />
-                  ))}
-                </div>
-
-                {/* Intermediate Places Along Route (Hotels & Parks) */}
-                {selectedRoute && !isLoadingRoutes && renderPlacesSection()}
-
-                {/* Mobile Turn-by-Turn Guidance */}
-                {selectedRoute && selectedRoute.instructions?.length > 0 && (
-                  <div className="p-3.5 rounded-2xl bg-muted border border-border space-y-2">
-                    <span className="text-xs font-bold text-foreground block">
-                      Turn-by-Turn Directions
-                    </span>
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {selectedRoute.instructions.map((step, idx) => (
-                        <div key={idx} className="flex items-start gap-2 text-xs">
-                          <span className="h-4 w-4 rounded-full bg-card text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
-                            {idx + 1}
-                          </span>
-                          <div>
-                            <p className="text-foreground font-medium">{step.text}</p>
-                            <span className="text-[10px] text-muted-foreground">
-                              {formatDistance(step.distanceKm)} • {formatDuration(step.durationMin)}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </div>
       </div>
     </div>
   );
