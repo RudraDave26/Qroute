@@ -17,6 +17,7 @@ import {
   Sun,
   Moon,
   Atom,
+  Sparkles,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -49,6 +50,7 @@ export function Navbar() {
 
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: Navigation },
+    { href: '/features', label: 'Features', icon: Sparkles },
     { href: '/plan', label: 'Route Planner', icon: Sliders },
     { href: '/traffic', label: 'Live Traffic', icon: Radio },
     { href: '/lab', label: 'Optimization Lab', icon: Cpu, isHighlight: true },

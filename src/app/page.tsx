@@ -207,271 +207,29 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 3. System Features & Architecture Showcase (Matches Photos 01 to 05) */}
-      <section className="py-16 md:py-24 bg-card border-b border-border/40">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="text-center space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-quantum-600 dark:text-quantum-400">
-              System Specifications & Architecture
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-foreground">
-              Core Platform Capabilities
-            </h2>
-            <p className="text-sm text-muted-foreground max-w-xl mx-auto">
-              Engineered for high accuracy, transparent real-time telemetry, and multi-objective quantum-inspired optimization.
-            </p>
-          </div>
-
-          <div className="divide-y divide-border/60 space-y-8">
-            {/* 01 — Smart route planner */}
-            <div className="pt-8 first:pt-0 flex flex-col md:flex-row items-start gap-6 lg:gap-10">
-              <div className="w-full md:w-48 h-36 rounded-2xl bg-slate-100 dark:bg-navy-900 border border-border/80 p-3 shrink-0 flex flex-col justify-between shadow-xs overflow-hidden relative group">
-                <div className="flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-3.5 w-3.5 text-emerald-500" /> Origin
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Navigation className="h-3.5 w-3.5 text-rose-500" /> Dest
-                  </span>
-                </div>
-                {/* Visual miniature route */}
-                <div className="relative h-16 w-full flex items-center justify-center">
-                  <div className="w-full h-1 bg-gradient-to-r from-emerald-500 via-cyan-400 to-rose-500 rounded-full relative">
-                    <div className="absolute left-1/2 -top-1.5 h-4 w-4 rounded-full bg-amber-400 border-2 border-card ring-2 ring-amber-400/20" title="Stop 1" />
-                  </div>
-                </div>
-                <div className="flex items-center justify-between text-[10px] text-muted-foreground font-medium">
-                  <span>37 States • 635 Districts</span>
-                  <span className="text-quantum-600 font-bold">1-Click</span>
-                </div>
+      {/* 3. Core Features & Capabilities Teaser Banner */}
+      <section className="py-12 bg-card border-b border-border/40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="p-8 rounded-3xl bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 dark:from-navy-900 dark:via-navy-950 dark:to-navy-900 border border-border flex flex-col md:flex-row items-center justify-between gap-6 shadow-xs">
+            <div className="space-y-2 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-quantum-500/10 text-quantum-600 dark:text-quantum-400 border border-quantum-500/20">
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Dedicated Features Breakdown</span>
               </div>
-
-              <div className="space-y-3 flex-1">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <h3 className="text-lg font-bold text-foreground tracking-tight">
-                    01 — Smart route planner
-                  </h3>
-                  <Link
-                    href="/dashboard"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-quantum-600 dark:text-quantum-400 hover:underline"
-                  >
-                    <span>Open Planner</span>
-                    <ArrowRight className="h-3 w-3" />
-                  </Link>
-                </div>
-                <ul className="space-y-1.5 text-xs text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="text-foreground">•</span>
-                    <span>Search any Indian city or address.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-foreground">•</span>
-                    <span>Origin and destination autocomplete.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-foreground">•</span>
-                    <span>Swap locations and add multiple stops.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-foreground">•</span>
-                    <span>One clear <strong>Find Best Route</strong> button.</span>
-                  </li>
-                </ul>
-              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground">
+                Explore All 5 Core Platform Capabilities
+              </h2>
+              <p className="text-xs sm:text-sm text-muted-foreground max-w-xl">
+                Discover our Smart Multi-Stop Route Planner, 3-Alternative Comparison, Traffic Intelligence, QIGA Optimization Lab, and Powertrain Calculator.
+              </p>
             </div>
-
-            {/* 02 — Route comparison */}
-            <div className="pt-8 flex flex-col md:flex-row items-start gap-6 lg:gap-10">
-              <div className="w-full md:w-48 h-36 rounded-2xl bg-slate-100 dark:bg-navy-900 border border-border/80 p-3 shrink-0 flex flex-col justify-between shadow-xs overflow-hidden">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase flex items-center justify-between">
-                  <span>Alternatives</span>
-                  <span className="text-emerald-500 font-semibold">3 Routes</span>
-                </div>
-                <div className="space-y-1 text-[10px]">
-                  <div className="p-1 rounded bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 font-bold flex justify-between">
-                    <span>Fastest</span>
-                    <span>24 min</span>
-                  </div>
-                  <div className="p-1 rounded bg-slate-200 dark:bg-navy-800 text-muted-foreground flex justify-between">
-                    <span>Lowest Cost</span>
-                    <span>₹85</span>
-                  </div>
-                  <div className="p-1 rounded bg-slate-200 dark:bg-navy-800 text-muted-foreground flex justify-between">
-                    <span>Eco-Friendly</span>
-                    <span>1.2 kg CO₂</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3 flex-1">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <h3 className="text-lg font-bold text-foreground tracking-tight">
-                    02 — Route comparison
-                  </h3>
-                  <Link
-                    href="/dashboard"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-quantum-600 dark:text-quantum-400 hover:underline"
-                  >
-                    <span>View Comparisons</span>
-                    <ArrowRight className="h-3 w-3" />
-                  </Link>
-                </div>
-                <p className="text-xs font-semibold text-foreground">
-                  Show three alternatives where available:
-                </p>
-                <ul className="space-y-1.5 text-xs text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="text-foreground">•</span>
-                    <span><strong>Fastest route</strong> (Expressway corridors & grade-separated bypasses)</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-foreground">•</span>
-                    <span><strong>Lowest fuel cost</strong> (Toll-free, steady cruise velocity)</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-foreground">•</span>
-                    <span><strong>Eco-friendly route</strong> (Lowest emissions & regenerative braking recovery)</span>
-                  </li>
-                </ul>
-                <p className="text-xs text-muted-foreground pt-1">
-                  Each card should show ETA, distance, estimated cost and emissions, with the recommended route highlighted.
-                </p>
-              </div>
-            </div>
-
-            {/* 03 — Traffic intelligence */}
-            <div className="pt-8 flex flex-col md:flex-row items-start gap-6 lg:gap-10">
-              <div className="w-full md:w-48 h-36 rounded-2xl bg-slate-100 dark:bg-navy-900 border border-border/80 p-3 shrink-0 flex flex-col justify-between shadow-xs overflow-hidden">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase">Telemetry</span>
-                  <StatusBadge status="LIVE" showIcon={false} className="py-0 px-1 text-[8px]" />
-                </div>
-                <div className="space-y-1 text-[10px]">
-                  <div className="flex items-center justify-between">
-                    <span className="text-amber-600 font-semibold">⚠ Congestion</span>
-                    <span>+8 min</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-rose-600 font-semibold">⛔ Choke Point</span>
-                    <span>Bypassed</span>
-                  </div>
-                  <div className="flex items-center justify-between text-muted-foreground">
-                    <span>Flow Freshness</span>
-                    <span className="font-semibold text-emerald-600">Active</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3 flex-1">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <h3 className="text-lg font-bold text-foreground tracking-tight">
-                    03 — Traffic intelligence
-                  </h3>
-                  <Link
-                    href="/traffic"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-quantum-600 dark:text-quantum-400 hover:underline"
-                  >
-                    <span>Traffic Telemetry</span>
-                    <ArrowRight className="h-3 w-3" />
-                  </Link>
-                </div>
-                <ul className="space-y-1.5 text-xs text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="text-foreground">•</span>
-                    <span>Congestion shown on the map.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-foreground">•</span>
-                    <span>Road incidents and closures, when available.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-foreground">•</span>
-                    <span>Traffic-data source and last-updated time.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-foreground">•</span>
-                    <span>Clear status if live data is unavailable.</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* 04 — Optimization lab */}
-            <div className="pt-8 flex flex-col md:flex-row items-start gap-6 lg:gap-10">
-              <div className="w-full md:w-48 h-36 rounded-2xl bg-navy-950 text-white p-3 shrink-0 flex flex-col justify-between shadow-xs border border-navy-800">
-                <div className="flex items-center justify-between text-[10px]">
-                  <span className="text-cyan-400 font-mono font-bold">QIGA vs Baselines</span>
-                  <span className="text-emerald-400 font-bold">Real Iter.</span>
-                </div>
-                {/* Visual miniature chart */}
-                <div className="h-14 w-full flex items-end justify-between gap-1 pt-2">
-                  <div className="w-1/4 bg-slate-700 h-[85%] rounded-t text-[8px] text-center text-slate-300">Dijk.</div>
-                  <div className="w-1/4 bg-slate-600 h-[75%] rounded-t text-[8px] text-center text-slate-300">A*</div>
-                  <div className="w-1/4 bg-blue-500 h-[65%] rounded-t text-[8px] text-center text-white">GA</div>
-                  <div className="w-1/4 bg-gradient-to-t from-cyan-600 to-quantum-400 h-[45%] rounded-t text-[8px] text-center text-white font-bold">QIGA</div>
-                </div>
-                <div className="text-[9px] text-slate-400 text-center">Score: 0.1469 (Pareto Best)</div>
-              </div>
-
-              <div className="space-y-3 flex-1">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <h3 className="text-lg font-bold text-foreground tracking-tight">
-                    04 — Optimization lab
-                  </h3>
-                  <Link
-                    href="/lab"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-quantum-600 dark:text-quantum-400 hover:underline"
-                  >
-                    <span>Run Optimization Lab</span>
-                    <ArrowRight className="h-3 w-3" />
-                  </Link>
-                </div>
-                <p className="text-xs text-foreground font-semibold">
-                  Compare Dijkstra, A*, Genetic Algorithm and Quantum-Inspired Genetic Algorithm (QIGA).
-                </p>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Display route cost, execution time and solution quality using the same test cases. Don&apos;t show fabricated performance results.
-                </p>
-              </div>
-            </div>
-
-            {/* 05 — Vehicle and fuel calculator */}
-            <div className="pt-8 flex flex-col md:flex-row items-start gap-6 lg:gap-10">
-              <div className="w-full md:w-48 h-36 rounded-2xl bg-slate-100 dark:bg-navy-900 border border-border/80 p-3 shrink-0 flex flex-col justify-between shadow-xs overflow-hidden">
-                <div className="text-[10px] font-bold text-muted-foreground uppercase flex items-center justify-between">
-                  <span>Powertrains</span>
-                  <span className="text-quantum-600 font-bold">5 Options</span>
-                </div>
-                <div className="grid grid-cols-5 gap-1 text-center py-2">
-                  <span title="Petrol" className="p-1 rounded bg-muted text-[10px]">🚗</span>
-                  <span title="Diesel" className="p-1 rounded bg-muted text-[10px]">🚙</span>
-                  <span title="CNG" className="p-1 rounded bg-muted text-[10px]">🚐</span>
-                  <span title="EV" className="p-1 rounded bg-emerald-500/20 text-[10px]">⚡</span>
-                  <span title="Motorcycle" className="p-1 rounded bg-muted text-[10px]">🏍</span>
-                </div>
-                <div className="text-[10px] text-center text-muted-foreground">
-                  ₹ / Litre • ₹ / kWh Real Tariffs
-                </div>
-              </div>
-
-              <div className="space-y-3 flex-1">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <h3 className="text-lg font-bold text-foreground tracking-tight">
-                    05 — Vehicle and fuel calculator
-                  </h3>
-                  <Link
-                    href="/plan"
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-quantum-600 dark:text-quantum-400 hover:underline"
-                  >
-                    <span>Configure Vehicle</span>
-                    <ArrowRight className="h-3 w-3" />
-                  </Link>
-                </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Let users select petrol, diesel, CNG, EV or motorcycle, then estimate trip expenses using fuel efficiency and clearly labelled fuel/electricity prices.
-                </p>
-              </div>
-            </div>
+            <Link
+              href="/features"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-xs sm:text-sm bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-all shrink-0"
+            >
+              <span>View Features Page</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>

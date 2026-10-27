@@ -39,6 +39,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/features" className="hover:text-foreground transition-colors font-medium text-quantum-600 dark:text-quantum-400">
+                  Features & Capabilities
+                </Link>
+              </li>
+              <li>
                 <Link href="/plan" className="hover:text-foreground transition-colors">
                   Multi-Objective Planner
                 </Link>
