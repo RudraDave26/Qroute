@@ -27,6 +27,8 @@ import {
   BatteryCharging,
   X,
   Sparkles,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import { formatCurrency, formatDistance, formatDuration, formatEmissions } from '@/lib/utils';
 
@@ -58,9 +60,10 @@ export default function DashboardPage() {
   const [showTrafficFlow, setShowTrafficFlow] = useState(false);
   const [tomtomTileUrl, setTomtomTileUrl] = useState('');
 
-  // UI state for clutter reduction & mobile bottom sheet
+  // UI state for clutter reduction, responsiveness & mobile bottom sheet
   const [showAnalyticsDrawer, setShowAnalyticsDrawer] = useState(false);
   const [isMobileSheetExpanded, setIsMobileSheetExpanded] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Results state
   const [routes, setRoutes] = useState<RouteAlternative[]>([]);
@@ -505,16 +508,29 @@ export default function DashboardPage() {
 
   return (
     <div className="relative flex flex-col md:flex-row h-[calc(100vh-4rem)] overflow-hidden bg-background">
-      {/* DESKTOP SIDE PANEL (Compact, Uncluttered, Maximize Map) */}
-      <div className="hidden md:flex w-[380px] lg:w-[420px] flex-col h-full bg-card border-r border-border shrink-0 z-20 overflow-hidden shadow-sm">
+      {/* DESKTOP SIDE PANEL (Compact, Uncluttered, Maximize Map, Collapsible on Tablet/Desktop) */}
+      <div className={`hidden ${isSidebarCollapsed ? 'md:hidden' : 'md:flex'} w-[340px] lg:w-[380px] xl:w-[420px] flex-col h-full bg-card border-r border-border shrink-0 z-20 overflow-hidden shadow-sm transition-all duration-300`}>
         {/* Top Input Section */}
         <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-              <Navigation className="h-4 w-4 text-quantum-600 dark:text-quantum-400" />
-              Route Navigation
-            </h2>
-            <span className="text-[10px] font-semibold text-muted-foreground">QIGA Engine</span>
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+                <Navigation className="h-4 w-4 text-quantum-600 dark:text-quantum-400" />
+                Route Navigation
+              </h2>
+              <span className="text-[10px] font-semibold text-muted-foreground px-1.5 py-0.5 rounded bg-muted">
+                QIGA Engine
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsSidebarCollapsed(true)}
+              title="Collapse sidebar for full map view"
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              aria-label="Collapse sidebar"
+            >
+              <PanelLeftClose className="h-4 w-4" />
+            </button>
           </div>
 
           {renderRouteInputs()}
@@ -638,24 +654,39 @@ export default function DashboardPage() {
 
       {/* FULL-SCREEN MAP CANVAS (The Main Focus) */}
       <div className="flex-1 relative w-full h-full flex flex-col">
-        {/* Floating Top Journey HUD (Sleek, uncluttered, transparent pill) */}
+        {/* Floating button to reopen sidebar on tablet/desktop when collapsed */}
+        {isSidebarCollapsed && (
+          <div className="hidden md:block absolute top-3 left-4 z-20 pointer-events-auto">
+            <button
+              type="button"
+              onClick={() => setIsSidebarCollapsed(false)}
+              className="bg-card/95 backdrop-blur-md border border-border shadow-md rounded-xl px-3 py-1.5 flex items-center gap-2 text-xs font-bold text-foreground hover:bg-muted transition-all hover:scale-105 active:scale-95 group"
+              title="Open Route Planning Panel"
+            >
+              <PanelLeftOpen className="h-4 w-4 text-quantum-600 dark:text-quantum-400 transition-transform group-hover:translate-x-0.5" />
+              <span>Plan Route</span>
+            </button>
+          </div>
+        )}
+
+        {/* Floating Top Journey HUD (Sleek, uncluttered, responsive pill) */}
         {selectedRoute && (
-          <div className="absolute top-3 left-3 right-3 md:left-4 md:right-auto z-20 pointer-events-none flex flex-wrap items-center gap-2">
-            <div className="pointer-events-auto bg-card/95 backdrop-blur-md border border-border shadow-md rounded-xl px-3.5 py-1.5 flex items-center gap-3 text-xs font-semibold">
-              <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                <span className="font-bold text-foreground">{selectedRoute.name}</span>
+          <div className={`absolute top-3 left-3 right-3 md:right-auto z-20 pointer-events-none flex flex-wrap items-center gap-2 ${isSidebarCollapsed ? 'md:left-36' : 'md:left-4'}`}>
+            <div className="pointer-events-auto bg-card/95 backdrop-blur-md border border-border shadow-md rounded-xl px-3 py-1.5 flex items-center gap-2 sm:gap-3 text-xs font-semibold max-w-full overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                <span className="font-bold text-foreground truncate max-w-[110px] sm:max-w-[180px]">{selectedRoute.name}</span>
               </div>
-              <div className="h-4 w-px bg-border" />
-              <div className="text-muted-foreground">
+              <div className="h-3.5 w-px bg-border shrink-0" />
+              <div className="text-muted-foreground shrink-0 whitespace-nowrap">
                 ETA: <strong className="text-foreground">{formatDuration(selectedRoute.durationMin)}</strong>
               </div>
-              <div className="h-4 w-px bg-border" />
-              <div className="text-muted-foreground">
+              <div className="h-3.5 w-px bg-border shrink-0 hidden sm:block" />
+              <div className="text-muted-foreground shrink-0 whitespace-nowrap hidden sm:block">
                 Dist: <strong className="text-foreground">{formatDistance(selectedRoute.distanceKm)}</strong>
               </div>
-              <div className="h-4 w-px bg-border" />
-              <div className="text-emerald-600 dark:text-emerald-400 font-bold">
+              <div className="h-3.5 w-px bg-border shrink-0" />
+              <div className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0 whitespace-nowrap">
                 {formatCurrency(selectedRoute.fuelCostInr)}
               </div>
             </div>
@@ -735,18 +766,18 @@ export default function DashboardPage() {
           <div className="p-4 pt-1 space-y-4">
             {/* When collapsed on mobile, show quick one-line trip summary */}
             {!isMobileSheetExpanded && selectedRoute && (
-              <div className="flex items-center justify-between pb-1">
-                <div>
-                  <span className="text-[10px] text-muted-foreground uppercase font-bold">Selected Route</span>
-                  <p className="text-xs font-bold text-foreground truncate max-w-[200px]">
+              <div className="flex items-center justify-between pb-1 gap-2 min-w-0">
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block">Selected Route</span>
+                  <p className="text-xs sm:text-sm font-bold text-foreground truncate">
                     {selectedRoute.name}
                   </p>
                 </div>
-                <div className="text-right">
-                  <span className="text-base font-extrabold text-quantum-600 dark:text-quantum-400">
+                <div className="text-right shrink-0">
+                  <span className="text-base sm:text-lg font-extrabold text-quantum-600 dark:text-quantum-400 block leading-tight">
                     {formatDuration(selectedRoute.durationMin)}
                   </span>
-                  <p className="text-[10px] text-muted-foreground">
+                  <p className="text-[10px] text-muted-foreground whitespace-nowrap">
                     {formatDistance(selectedRoute.distanceKm)} • {formatCurrency(selectedRoute.fuelCostInr)}
                   </p>
                 </div>

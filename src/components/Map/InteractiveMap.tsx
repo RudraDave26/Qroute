@@ -112,12 +112,12 @@ function MapFloatingControls({
   };
 
   return (
-    <div className="leaflet-bottom leaflet-right pointer-events-auto mb-4 mr-3 z-[1000] flex flex-col gap-2">
+    <div className="leaflet-bottom leaflet-right pointer-events-auto mb-36 md:mb-4 mr-3 z-[1000] flex flex-col gap-2">
       <div className="bg-card/95 backdrop-blur-md border border-border shadow-md rounded-xl overflow-hidden flex flex-col">
         <button
           type="button"
           onClick={() => map.zoomIn()}
-          className="p-2.5 hover:bg-muted text-foreground transition-colors border-b border-border flex items-center justify-center hover:text-quantum-600"
+          className="p-2.5 hover:bg-muted text-foreground transition-colors border-b border-border flex items-center justify-center hover:text-quantum-600 active:scale-95"
           title="Zoom In"
           aria-label="Zoom in"
         >
@@ -126,7 +126,7 @@ function MapFloatingControls({
         <button
           type="button"
           onClick={() => map.zoomOut()}
-          className="p-2.5 hover:bg-muted text-foreground transition-colors flex items-center justify-center hover:text-quantum-600"
+          className="p-2.5 hover:bg-muted text-foreground transition-colors flex items-center justify-center hover:text-quantum-600 active:scale-95"
           title="Zoom Out"
           aria-label="Zoom out"
         >

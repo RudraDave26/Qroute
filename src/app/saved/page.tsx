@@ -185,7 +185,7 @@ export default function SavedRoutesPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-4 gap-2 pt-2 border-t border-border/50 text-xs">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-border/50 text-xs">
                       <div>
                         <span className="text-[10px] text-muted-foreground block">VEHICLE</span>
                         <span className="font-semibold uppercase text-quantum-600 dark:text-quantum-400">

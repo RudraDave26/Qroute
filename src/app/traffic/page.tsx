@@ -97,7 +97,7 @@ export default function LiveTrafficPage() {
         </div>
 
         {/* Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <select
             value={selectedCity}
             onChange={(e) => setSelectedCity(e.target.value)}
@@ -200,7 +200,7 @@ export default function LiveTrafficPage() {
       </div>
 
       {/* Live Metropolitan Traffic Map Canvas */}
-      <div className="p-6 rounded-3xl bg-card border border-border shadow-xs space-y-4">
+      <div className="p-4 sm:p-6 rounded-3xl bg-card border border-border shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 className="text-base font-bold text-foreground flex items-center gap-2">
@@ -216,7 +216,7 @@ export default function LiveTrafficPage() {
           </span>
         </div>
 
-        <div className="h-[440px] w-full rounded-2xl overflow-hidden border border-border shadow-inner">
+        <div className="h-[360px] sm:h-[440px] lg:h-[480px] w-full rounded-2xl overflow-hidden border border-border shadow-inner">
           <MapWrapper
             center={cityCoordinates[selectedCity] || cityCoordinates['Bengaluru']}
             zoom={12}
