@@ -26,7 +26,7 @@ export const PRESET_LOCATIONS: SearchResultItem[] = [
   { id: 'del-airport', name: 'IGI Airport Terminal 3, Delhi', displayName: 'Indira Gandhi International Airport, New Delhi, Delhi, India', lat: 28.5562, lng: 77.1000, type: 'aeroway' },
 
   // Mumbai
-  { id: 'mum-bkc', name: 'Bandra Kurla Complex, Mumbai', displayName: 'BKC, Bandra East, Mumbai, Maharashtra, India', lat: 19.0657, lng: 77.8687, type: 'suburb' },
+  { id: 'mum-bkc', name: 'Bandra Kurla Complex, Mumbai', displayName: 'BKC, Bandra East, Mumbai, Maharashtra, India', lat: 19.0657, lng: 72.8687, type: 'suburb' },
   { id: 'mum-nariman', name: 'Nariman Point, Mumbai', displayName: 'Nariman Point, South Mumbai, Maharashtra, India', lat: 18.9269, lng: 72.8239, type: 'suburb' },
   { id: 'mum-andheri', name: 'Andheri West, Mumbai', displayName: 'Lokhandwala, Andheri West, Mumbai, Maharashtra, India', lat: 19.1363, lng: 72.8277, type: 'suburb' },
   { id: 'mum-thane', name: 'Thane West, MMR', displayName: 'Viviana Mall, Thane West, Maharashtra, India', lat: 19.2084, lng: 72.9715, type: 'city' },

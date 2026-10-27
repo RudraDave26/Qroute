@@ -1,3 +1,26 @@
+/**
+ * Multi-Powertrain Physics & Emissions Energy Models
+ * ===================================================
+ * 
+ * PRACTICAL MOTIVATION & PHYSICS MODELING:
+ * ----------------------------------------
+ * Standard navigation engines (e.g. basic Google Maps / Waze) treat vehicles identically
+ * regardless of whether the driver is in a petrol sedan, diesel SUV, CNG cab, or an electric car.
+ * 
+ * In real-world urban traffic, different powertrains react drastically differently to congestion:
+ * 
+ * 1. Internal Combustion Engine (ICE - Petrol / Diesel):
+ *    - Standstill idling consumes approximately 0.9 to 1.3 Liters of fuel per hour without moving forward.
+ *    - Frequent stop-and-go acceleration forces internal combustion engines into low thermal efficiency gear states (1st/2nd gear).
+ *    - Formula: Total Liters = (Distance / Efficiency) + (Delay_Hours × Idle_Burn_Rate)
+ * 
+ * 2. Electric Vehicles (EV):
+ *    - An electric motor consumes ZERO energy when standing still (no idling loss).
+ *    - However, auxiliary battery systems (air conditioning / heating / cabin infotainment) draw continuous electrical load (~1.5 kW).
+ *    - Furthermore, while ICE vehicles emit direct tailpipe greenhouse gases, EV emissions are computed
+ *      using the regional power grid emission intensity factor (~52 g CO2/km under India's average generation mix).
+ */
+
 import { VehicleProfile, VehicleType } from '../types';
 
 export const DEFAULT_VEHICLE_PROFILES: Record<VehicleType, VehicleProfile> = {

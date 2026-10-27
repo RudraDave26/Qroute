@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { MapWrapper } from '@/components/Map/MapWrapper';
 import { RouteCard } from '@/components/RouteCard';
 import {
@@ -32,7 +33,9 @@ import {
 } from 'lucide-react';
 import { formatCurrency, formatDistance, formatDuration, formatEmissions } from '@/lib/utils';
 
-export default function DashboardPage() {
+function DashboardContent() {
+  const searchParams = useSearchParams();
+
   // Endpoints state
   const [origin, setOrigin] = useState<LatLng>({
     lat: 12.9352,
@@ -79,29 +82,132 @@ export default function DashboardPage() {
   const [isSearchingDest, setIsSearchingDest] = useState(false);
   const [isSavedSuccessfully, setIsSavedSuccessfully] = useState(false);
 
-  // Initial fetch on mount
+  // Initial fetch on mount & URL parameter parsing
   useEffect(() => {
-    fetchRouteData();
+    let initOrigin = { ...origin };
+    let initDest = { ...destination };
+    let initOriginQuery = originQuery;
+    let initDestQuery = destQuery;
+    let initVehicle = vehicleType;
+    let initObj = objective;
+    let hasCustomParam = false;
+
+    if (searchParams) {
+      // 1. Direct coordinates from saved routes or external links
+      const lat1 = searchParams.get('lat1');
+      const lng1 = searchParams.get('lng1');
+      const lat2 = searchParams.get('lat2');
+      const lng2 = searchParams.get('lng2');
+      const label1 = searchParams.get('label1') || searchParams.get('originLabel');
+      const label2 = searchParams.get('label2') || searchParams.get('destLabel');
+
+      if (lat1 && lng1) {
+        const pLat = parseFloat(lat1);
+        const pLng = parseFloat(lng1);
+        if (!isNaN(pLat) && !isNaN(pLng)) {
+          initOrigin = { lat: pLat, lng: pLng, label: label1 || `Location (${pLat.toFixed(3)}, ${pLng.toFixed(3)})` };
+          initOriginQuery = initOrigin.label || '';
+          hasCustomParam = true;
+        }
+      }
+
+      if (lat2 && lng2) {
+        const pLat = parseFloat(lat2);
+        const pLng = parseFloat(lng2);
+        if (!isNaN(pLat) && !isNaN(pLng)) {
+          initDest = { lat: pLat, lng: pLng, label: label2 || `Location (${pLat.toFixed(3)}, ${pLng.toFixed(3)})` };
+          initDestQuery = initDest.label || '';
+          hasCustomParam = true;
+        }
+      }
+
+      // 2. Demo trip shortcuts from landing page
+      const fromParam = searchParams.get('from')?.toLowerCase();
+      const toParam = searchParams.get('to')?.toLowerCase();
+
+      if (fromParam === 'koramangala' && toParam === 'whitefield') {
+        initOrigin = { lat: 12.9352, lng: 77.6245, label: 'Koramangala 4th Block, Bengaluru' };
+        initDest = { lat: 12.9698, lng: 77.7500, label: 'Whitefield ITPL, Bengaluru' };
+        initOriginQuery = initOrigin.label || '';
+        initDestQuery = initDest.label || '';
+        initVehicle = 'ev';
+        hasCustomParam = true;
+      } else if (fromParam === 'cp' && toParam === 'cybercity') {
+        initOrigin = { lat: 28.6315, lng: 77.2167, label: 'Connaught Place, New Delhi' };
+        initDest = { lat: 28.4950, lng: 77.0895, label: 'DLF Cyber City, Gurugram' };
+        initOriginQuery = initOrigin.label || '';
+        initDestQuery = initDest.label || '';
+        initVehicle = 'petrol';
+        hasCustomParam = true;
+      } else if (fromParam === 'nariman' && toParam === 'bkc') {
+        initOrigin = { lat: 18.9269, lng: 72.8239, label: 'Nariman Point, Mumbai' };
+        initDest = { lat: 19.0657, lng: 72.8687, label: 'Bandra Kurla Complex (BKC), Mumbai' };
+        initOriginQuery = initOrigin.label || '';
+        initDestQuery = initDest.label || '';
+        initVehicle = 'cng';
+        hasCustomParam = true;
+      }
+
+      // 3. Vehicle and objective params from Route Planner (/plan)
+      const vehParam = searchParams.get('vehicle');
+      if (vehParam && ['petrol', 'diesel', 'cng', 'ev', 'motorcycle'].includes(vehParam)) {
+        initVehicle = vehParam as VehicleType;
+        hasCustomParam = true;
+      }
+
+      const objParam = searchParams.get('objective');
+      if (objParam && ['fastest', 'cheapest', 'shortest', 'eco', 'balanced'].includes(objParam)) {
+        initObj = objParam as OptimizationObjective;
+        hasCustomParam = true;
+      }
+    }
+
+    if (hasCustomParam) {
+      setOrigin(initOrigin);
+      setOriginQuery(initOriginQuery);
+      setDestination(initDest);
+      setDestQuery(initDestQuery);
+      setVehicleType(initVehicle);
+      setObjective(initObj);
+      fetchRouteData(initOrigin, initDest, initVehicle, initObj);
+      fetchWeatherData(initOrigin.lat, initOrigin.lng);
+      fetchAirQualityData(initOrigin.lat, initOrigin.lng);
+      fetchChargingData(initOrigin.lat, initOrigin.lng);
+    } else {
+      fetchRouteData(origin, destination, vehicleType, objective);
+      fetchWeatherData(origin.lat, origin.lng);
+      fetchAirQualityData(origin.lat, origin.lng);
+      fetchChargingData(origin.lat, origin.lng);
+    }
+
     fetchIncidentData();
-    fetchWeatherData(origin.lat, origin.lng);
-    fetchAirQualityData(origin.lat, origin.lng);
-    fetchChargingData(origin.lat, origin.lng);
     fetchFuelPriceData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // Fetch routes from API
-  const fetchRouteData = async () => {
+  const fetchRouteData = async (
+    customOrigin?: LatLng,
+    customDest?: LatLng,
+    customVehicle?: VehicleType,
+    customObj?: OptimizationObjective
+  ) => {
     setIsLoadingRoutes(true);
+    const activeOrigin = customOrigin || origin;
+    const activeDest = customDest || destination;
+    const activeVehicle = customVehicle || vehicleType;
+    const activeObj = customObj || objective;
+
     try {
       const res = await fetch('/api/routes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          origin,
-          destination,
+          origin: activeOrigin,
+          destination: activeDest,
           stops: stops.filter((s) => s.lat && s.lng).map((s) => ({ lat: s.lat, lng: s.lng, label: s.label })),
-          vehicleType,
-          objective,
+          vehicleType: activeVehicle,
+          objective: activeObj,
           avoidTolls,
         }),
       });
@@ -171,13 +277,13 @@ export default function DashboardPage() {
 
   const fetchFuelPriceData = async () => {
     try {
-      const res = await fetch('/api/fuel-prices?state=Karnataka');
+      const res = await fetch('/api/fuel-prices?city=Bengaluru');
       if (res.ok) {
         const data = await res.json();
         setFuelInfo({
-          petrol: data.prices.petrol,
-          diesel: data.prices.diesel,
-          isLive: data.dataStatus === 'LIVE',
+          petrol: data.prices?.petrol ?? 102.86,
+          diesel: data.prices?.diesel ?? 88.94,
+          isLive: data.dataStatus === 'LIVE' || data.isLive === true,
         });
       }
     } catch (e) {}
@@ -487,7 +593,7 @@ export default function DashboardPage() {
       {/* Primary CTA Button */}
       <button
         type="button"
-        onClick={fetchRouteData}
+        onClick={() => fetchRouteData()}
         disabled={isLoadingRoutes}
         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-all disabled:opacity-50"
       >
@@ -592,7 +698,7 @@ export default function DashboardPage() {
               </p>
               <button
                 type="button"
-                onClick={fetchRouteData}
+                onClick={() => fetchRouteData()}
                 className="mt-2 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
               >
                 Retry Search
@@ -857,5 +963,22 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="w-full h-[calc(100vh-3.5rem)] flex items-center justify-center bg-background">
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-8 w-8 rounded-full border-2 border-quantum-500 border-t-transparent animate-spin" />
+            <span className="text-sm font-medium text-muted-foreground">Loading Route Navigation Canvas...</span>
+          </div>
+        </div>
+      }
+    >
+      <DashboardContent />
+    </Suspense>
   );
 }

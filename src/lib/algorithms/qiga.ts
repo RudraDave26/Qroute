@@ -1,10 +1,46 @@
+/**
+ * Quantum-Inspired Genetic Algorithm (QIGA) for Traffic Route Optimization
+ * =========================================================================
+ * 
+ * ACADEMIC BACKGROUND & CONCEPTUAL FOUNDATIONS:
+ * ---------------------------------------------
+ * Classical Genetic Algorithms (GAs) encode candidate solutions as static bitstrings (0 or 1).
+ * In contrast, QIGA (Han & Kim, 2002) uses the probabilistic concepts of Quantum Computing
+ * (qubits, superposition, and quantum rotation gates) on classical computers.
+ * 
+ * 1. Quantum Bit (Q-bit) Representation:
+ *    A qubit state |ψ⟩ is represented as a linear combination (superposition) of basis states |0⟩ and |1⟩:
+ *        |ψ⟩ = α|0⟩ + β|1⟩
+ *    where α and β are probability amplitudes (complex or real numbers) satisfying the normalization law:
+ *        |α|² + |β|² = 1
+ *    Here:
+ *        |α|² represents the probability of collapsing to state '0'.
+ *        |β|² represents the probability of collapsing to state '1'.
+ * 
+ * 2. Why QIGA Converges Faster with Smaller Populations:
+ *    Because a single Q-bit chromosome with M qubits implicitly represents 2^M states simultaneously
+ *    in superposition, QIGA explores the solution space far more broadly with a smaller population
+ *    (e.g., 20 individuals instead of 100+ required by classical GA), preventing premature convergence.
+ * 
+ * 3. Quantum Rotation Gate Update:
+ *    Instead of classical crossover and mutation alone, QIGA updates qubit amplitudes toward the best solution
+ *    using a 2x2 unitary quantum rotation matrix:
+ *        [ α' ]   [ cos(Δθ)  -sin(Δθ) ] [ α ]
+ *        [ β' ] = [ sin(Δθ)   cos(Δθ) ] [ β ]
+ *    The magnitude and sign of the rotation angle Δθ are determined using an lookup schedule
+ *    designed to guide the state vector toward the current global optimum.
+ */
+
 import { RoadNetworkGraph } from './graph';
 import { ObjectiveWeights, VehicleProfile, AlgorithmConvergenceStep } from '../types';
 import { calculateConsumptionAndCost } from './vehicleModels';
 
+/**
+ * A Quantum Bit (Q-bit) represented by real probability amplitudes α and β.
+ */
 export interface Qbit {
-  alpha: number; // probability amplitude of |0>
-  beta: number;  // probability amplitude of |1>
+  alpha: number; // Amplitude for state |0>, where |alpha|^2 is probability of observing 0
+  beta: number;  // Amplitude for state |1>, where |beta|^2 is probability of observing 1
 }
 
 export interface QigaResult {
@@ -28,6 +64,9 @@ export interface QigaResult {
   }[];
 }
 
+/**
+ * Executes the Quantum-Inspired Genetic Algorithm over the discretized road network graph.
+ */
 export function runQIGA(
   graph: RoadNetworkGraph,
   originId: string,
@@ -44,24 +83,27 @@ export function runQIGA(
 ): QigaResult {
   const startTime = performance.now();
 
-  const popSize = options.populationSize || 20; // QIGA requires smaller population due to quantum superposition
-  const maxGen = options.generations || 40;
-  const layers = options.layerCount || 5;
-  const perLayer = options.nodesPerLayer || 4; // 4 choices -> 2 qubits per layer
-  const bitsPerLayer = 2; // 2 bits represent 0, 1, 2, 3
-  const totalQubits = layers * bitsPerLayer;
+  // Population & chromosome parameters
+  const popSize = options.populationSize || 20; // Superposition allows smaller populations
+  const maxGen = options.generations || 40;     // Number of evolutionary iterations
+  const layers = options.layerCount || 5;       // Number of topological decision stages between origin & dest
+  const perLayer = options.nodesPerLayer || 4;  // Number of alternative corridor paths at each layer
+  const bitsPerLayer = 2;                       // 2 bits represent indices 0, 1, 2, 3 (2^2 = 4)
+  const totalQubits = layers * bitsPerLayer;    // Total quantum bits per individual chromosome
 
   // Quantum chromosome: array of Qbits
   type QChromosome = Qbit[];
 
-  // Initialize Quantum Population in equal superposition: alpha = 1/sqrt(2), beta = 1/sqrt(2)
-  const invSqrt2 = 1 / Math.sqrt(2);
+  // STEP 1: INITIALIZE QUANTUM POPULATION IN EQUAL SUPERPOSITION
+  // At generation 0, set α = 1/√2 ≈ 0.7071 and β = 1/√2 ≈ 0.7071.
+  // This means |α|² = 0.5 and |β|² = 0.5: every bit has an equal 50% chance of being 0 or 1,
+  // representing maximum entropy and unbiased global exploration across the entire network.
   let qPopulation: QChromosome[] = [];
 
   for (let i = 0; i < popSize; i++) {
     const qInd: QChromosome = [];
     for (let q = 0; q < totalQubits; q++) {
-      // Add a slight micro-jitter to avoid symmetric stagnation
+      // Micro-jitter prevents symmetric stagnation across identical individuals
       const jitter = (Math.random() - 0.5) * 0.05;
       const alpha = Math.cos(Math.PI / 4 + jitter);
       const beta = Math.sin(Math.PI / 4 + jitter);
@@ -70,7 +112,9 @@ export function runQIGA(
     qPopulation.push(qInd);
   }
 
-  // Measurement/Collapse helper: collapse Q-bits to classical bitstring
+  // STEP 2: QUANTUM MEASUREMENT / STATE COLLAPSE FUNCTION
+  // In quantum mechanics, observing a qubit forces it to collapse into a definite classical state (|0> or |1>).
+  // We sample a uniform random number r in [0, 1). If r < |β|², the qubit collapses to 1; otherwise, to 0.
   const measureQChromosome = (qInd: QChromosome): number[] => {
     return qInd.map((qbit) => {
       const prob1 = qbit.beta * qbit.beta;
@@ -194,53 +238,59 @@ export function runQIGA(
       bestCostScore: Number(bestEverEval.score.toFixed(4)),
     });
 
-    // 4. Quantum Rotation Gate Update
-    // Annealing rotation angle schedule: high exploration early, fine exploitation late
+    // STEP 4: QUANTUM ROTATION GATE UPDATE (Han & Kim, 2002)
+    // -------------------------------------------------------------
+    // Unlike classical GAs that alter bit values directly with random mutations,
+    // QIGA rotates the probability vector [α, β] on the unit circle toward the current best solution.
+    // As the algorithm progresses, we anneal (decrease) the base rotation angle θ:
+    // Large θ early on allows broad exploration; smaller θ later ensures fine-grained exploitation.
     const baseTheta = (options.baseRotationAngle || 0.035 * Math.PI) * (1 - (0.6 * gen) / maxGen);
 
     for (let i = 0; i < popSize; i++) {
       const qInd = qPopulation[i];
       const indBits = collapsedSolutions[i].bits;
-      const indFitness = collapsedSolutions[i].fitness;
-      const isFitterThanBest = indFitness > bestEverEval.score;
 
       for (let q = 0; q < totalQubits; q++) {
-        const xi = indBits[q];
-        const bi = bestEverBits[q];
+        const xi = indBits[q];       // Bit collapsed in current individual
+        const bi = bestEverBits[q];  // Corresponding bit in the best-ever route
         const alpha = qInd[q].alpha;
         const beta = qInd[q].beta;
 
-        // Lookup table for quantum rotation direction and sign
-        // Based on Han & Kim (2002) QIGA rotation gate design:
+        // Lookup Table for Quantum Rotation Direction & Sign Δθ:
+        // - If current collapsed bit (xi) is 0, but best-known solution (bi) is 1:
+        //   We rotate the state vector to INCREASE the probability |β|² of observing 1.
+        // - If current bit (xi) is 1, but best-known solution (bi) is 0:
+        //   We rotate the state vector to INCREASE the probability |α|² of observing 0.
+        // - If xi === bi:
+        //   Already aligned with best solution, so Δθ = 0 (with small 5% stochastic quantum tunneling to prevent stagnation).
         let deltaTheta = 0;
 
         if (xi === 0 && bi === 1) {
-          // Best solution has 1, current has 0 -> rotate toward 1
+          // Rotate toward state |1>
           if (alpha * beta > 0) deltaTheta = +baseTheta;
           else if (alpha * beta < 0) deltaTheta = -baseTheta;
           else deltaTheta = +baseTheta;
         } else if (xi === 1 && bi === 0) {
-          // Best solution has 0, current has 1 -> rotate toward 0
+          // Rotate toward state |0>
           if (alpha * beta > 0) deltaTheta = -baseTheta;
           else if (alpha * beta < 0) deltaTheta = +baseTheta;
           else deltaTheta = -baseTheta;
         } else {
-          // xi === bi: already aligned or exploring
+          // Already in agreement: apply micro-tunneling perturbation
           if (Math.random() < 0.05) {
-            // Quantum phase perturbation (prevents premature entanglement/lock-in)
             deltaTheta = (Math.random() - 0.5) * 0.02 * Math.PI;
           }
         }
 
-        // Apply 2x2 Unitary Rotation Matrix:
-        // [alpha'] = [cos(theta) -sin(theta)] [alpha]
-        // [beta' ]   [sin(theta)  cos(theta)] [beta ]
+        // Apply 2x2 Unitary Rotation Matrix U(Δθ):
+        // [ α' ] = [ cos(Δθ)  -sin(Δθ) ] [ α ]
+        // [ β' ]   [ sin(Δθ)   cos(Δθ) ] [ β ]
         const cosT = Math.cos(deltaTheta);
         const sinT = Math.sin(deltaTheta);
         let newAlpha = cosT * alpha - sinT * beta;
         let newBeta = sinT * alpha + cosT * beta;
 
-        // Normalize state vector to maintain |alpha|^2 + |beta|^2 = 1
+        // Normalization: Ensure |α|² + |β|² = 1 strictly holds (preserves total probability)
         const norm = Math.sqrt(newAlpha * newAlpha + newBeta * newBeta) || 1;
         newAlpha = newAlpha / norm;
         newBeta = newBeta / norm;

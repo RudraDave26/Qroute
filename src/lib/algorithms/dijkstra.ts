@@ -1,3 +1,17 @@
+/**
+ * Dijkstra's Algorithm (Exact Mathematical Baseline)
+ * ===================================================
+ * 
+ * ROLE IN ACADEMIC BENCHMARKING:
+ * ------------------------------
+ * Dijkstra's algorithm is a greedy, deterministic graph search algorithm that is mathematically
+ * guaranteed to find the globally optimal path from origin to destination for non-negative edge costs.
+ * 
+ * In this project, Dijkstra serves as the gold-standard ground truth (Optimality Score = 1.0)
+ * against which metaheuristics (GA, QIGA) and heuristics (A*) are benchmarked for accuracy,
+ * computational complexity, and runtime execution speedups.
+ */
+
 import { RoadNetworkGraph, GraphEdge } from './graph';
 import { ObjectiveWeights, VehicleProfile } from '../types';
 import { calculateConsumptionAndCost } from './vehicleModels';

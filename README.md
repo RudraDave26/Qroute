@@ -144,7 +144,52 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ---
 
-## 6. Project Team
+## 6. Academic Evaluation & Defense Guide
+
+This section is provided to assist students and researchers in defending the project during academic viva or conference presentations.
+
+### Q1: What is the core problem that QuantumRoute AI solves?
+**Answer:** Standard navigation software (like traditional Google Maps) focuses overwhelmingly on single-objective pathfinding—usually minimal travel time. This creates two critical flaws:
+1. **Herd Mentality Congestion:** Routing all vehicles onto the same "fastest" expressway causes secondary gridlock.
+2. **Powertrain Blindness:** Internal combustion vehicles burn high amounts of fuel while idling in traffic jams (~1.1 L/hr), whereas Electric Vehicles consume almost zero motor power at standstill but draw steady battery power (~1.5 kW) for cabin climate control (HVAC). QuantumRoute AI formulates route selection as a multi-objective optimization problem $J(r) = w_t T(r) + w_c C(r) + w_d D(r) + w_e E(r)$ customized to specific vehicle powertrains.
+
+### Q2: Does this project require an actual physical quantum computer to run?
+**Answer:** No. QuantumRoute AI employs a **Quantum-Inspired Genetic Algorithm (QIGA)**, which is an advanced classical metaheuristic. QIGA runs on standard classical hardware (CPUs) by mathematically modeling quantum principles—specifically Q-bit state vectors in superposition $|\psi\rangle = \alpha|0\rangle + \beta|1\rangle$ and 2×2 unitary rotation matrices $U(\Delta\theta)$. This gives the algorithm the superior global exploration and diversity preservation of quantum mechanics without requiring cryogenically cooled quantum processors.
+
+### Q3: How do Q-bits map to a physical road network?
+**Answer:** The road network is discretized into sequential decision stages (layers) between origin and destination. At each stage, there are multiple arterial corridors to choose from (e.g. 4 alternatives). Two Q-bits (representing states $00, 01, 10, 11$) encode the corridor choice for that layer. When measured, the Q-bit amplitudes collapse into a discrete corridor sequence that forms a complete end-to-end path.
+
+### Q4: Why is QIGA better than a Classical Genetic Algorithm (GA)?
+**Answer:**
+1. **Population Efficiency:** In classical GA, one chromosome represents only one fixed solution. In QIGA, a single chromosome of $M$ qubits in equal superposition $(\alpha = \beta = 1/\sqrt{2})$ simultaneously represents $2^M$ potential solutions. Thus, QIGA can explore vast search spaces with a much smaller population (e.g., 20 individuals vs 60+ in GA).
+2. **Guided Rotation vs. Random Mutation:** Classical GA relies on stochastic crossover and random bit-flip mutations, which can disrupt good paths. QIGA updates its probability vectors continuously using a unitary rotation gate $U(\Delta\theta)$ directed specifically toward the best-so-far solution, leading to faster and smoother convergence.
+
+### Q5: How do Dijkstra and A* compare in your benchmarks?
+**Answer:**
+- **Dijkstra's Algorithm** is an exact, deterministic algorithm. It is guaranteed to find the absolute minimum cost path, making it our gold-standard benchmark (Optimality Score = 1.0). However, it explores nodes exhaustively in all directions.
+- **A\* Search** uses an admissible heuristic (Haversine Euclidean distance assuming free-flow speed) to guide exploration directly toward the destination, visiting fewer nodes than Dijkstra while still finding the optimal path.
+- **Metaheuristics (GA & QIGA)** trade mathematical guarantees of absolute optimality for rapid exploration in complex, multi-modal, dynamic traffic environments with dynamic pricing, tolls, and environmental penalties.
+
+---
+
+## 7. Deployment to Vercel & GitHub
+
+### Deploying to Vercel (1-Click or CLI)
+1. Push your code to GitHub:
+   ```bash
+   git add .
+   git commit -m "Production release: QuantumRoute AI"
+   git push origin master
+   ```
+2. Import the repository in [Vercel Dashboard](https://vercel.com/new).
+3. The included `vercel.json` automatically configures framework settings, caching, and security headers (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`).
+4. (Optional) Set environment variables in Vercel:
+   - `TOMTOM_API_KEY`: For live TomTom traffic incidents and segment flow.
+   - `OPEN_METEO_ENABLED`: `true` (default).
+
+---
+
+## 8. Project Team
 
 Developed with pride by **MVP MAKERS**:
 - Full-Stack Geospatial Engineering & Optimization Research

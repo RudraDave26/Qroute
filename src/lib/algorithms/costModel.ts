@@ -1,3 +1,33 @@
+/**
+ * Multi-Objective Cost Model for Intelligent Urban Routing
+ * ========================================================
+ * 
+ * MATHEMATICAL FORMULATION:
+ * -------------------------
+ * In urban transportation, selecting the optimal route is rarely a single-objective problem:
+ * motorists care about arriving quickly (travel time), spending less (fuel/toll costs),
+ * reducing vehicle wear (distance), and minimizing their environmental footprint (CO2 emissions).
+ * 
+ * The composite objective function J(r) evaluates candidate route 'r' as:
+ *     J(r) = w_t · T'(r) + w_c · C'(r) + w_d · D'(r) + w_e · E'(r)
+ * 
+ * where:
+ *   - w_t, w_c, w_d, w_e ∈ [0, 1] are user-configured or preset objective weights satisfying:
+ *         w_t + w_c + w_d + w_e = 1.0
+ *   - T'(r), C'(r), D'(r), E'(r) are min-max normalized metrics in [0, 1].
+ * 
+ * WHY MIN-MAX NORMALIZATION IS ESSENTIAL:
+ * ---------------------------------------
+ * Raw values have vastly different physical units and magnitudes (e.g., travel time = 45 min,
+ * fuel cost = ₹280, distance = 25 km, emissions = 4.2 kg CO₂).
+ * Without normalization, higher-magnitude numbers (such as monetary costs in hundreds of Rupees)
+ * would dominate the objective score, completely drowning out emissions or distance.
+ * 
+ * Min-Max normalization scales each dimension proportionally:
+ *     X'(r) = (X(r) - X_min) / (X_max - X_min)
+ * Lower J(r) values denote superior (closer to Pareto-optimal) route choices.
+ */
+
 import { ObjectiveWeights, OptimizationObjective } from '../types';
 
 export const OBJECTIVE_PRESETS: Record<OptimizationObjective, ObjectiveWeights> = {

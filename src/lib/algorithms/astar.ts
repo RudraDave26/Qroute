@@ -1,3 +1,18 @@
+/**
+ * A* Heuristic Search Algorithm
+ * =============================
+ * 
+ * ROLE IN ACADEMIC BENCHMARKING:
+ * ------------------------------
+ * A* improves upon Dijkstra by augmenting the accumulated cost g(n) with an admissible heuristic h(n):
+ *     f(n) = g(n) + h(n)
+ * 
+ * An admissible heuristic never overestimates the true remaining cost to destination.
+ * Here, h(n) uses the great-circle Haversine distance assuming maximum free-flow velocity (80 km/h)
+ * with zero traffic delays. This allows A* to prune unpromising graph corridors, visiting significantly
+ * fewer states than Dijkstra while still converging on the optimal path.
+ */
+
 import { RoadNetworkGraph, GraphEdge } from './graph';
 import { ObjectiveWeights, VehicleProfile } from '../types';
 import { calculateConsumptionAndCost } from './vehicleModels';

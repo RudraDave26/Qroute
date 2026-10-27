@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StatusBadge } from '@/components/StatusBadge';
 import { MapWrapper } from '@/components/Map/MapWrapper';
 import { TrafficIncident, DataStatus } from '@/lib/types';
@@ -21,6 +21,20 @@ import {
 } from 'lucide-react';
 import { formatDuration } from '@/lib/utils';
 
+const CITY_COORDINATES: Record<string, { lat: number; lng: number }> = {
+  Bengaluru: { lat: 12.9716, lng: 77.5946 },
+  Delhi: { lat: 28.6139, lng: 77.2090 },
+  Mumbai: { lat: 19.0760, lng: 72.8777 },
+  Jaipur: { lat: 26.9124, lng: 75.7873 },
+  Hyderabad: { lat: 17.3850, lng: 78.4867 },
+  Pune: { lat: 18.5204, lng: 73.8567 },
+  Ahmedabad: { lat: 23.0225, lng: 72.5714 },
+  Lucknow: { lat: 26.8467, lng: 80.9462 },
+  Chennai: { lat: 13.0827, lng: 80.2707 },
+  Kolkata: { lat: 22.5726, lng: 88.3639 },
+  Chandigarh: { lat: 30.7333, lng: 76.7794 },
+};
+
 export default function LiveTrafficPage() {
   const [selectedCity, setSelectedCity] = useState('Bengaluru');
   const [trafficData, setTrafficData] = useState<any>(null);
@@ -30,23 +44,9 @@ export default function LiveTrafficPage() {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
 
-  const cityCoordinates: Record<string, { lat: number; lng: number }> = {
-    Bengaluru: { lat: 12.9716, lng: 77.5946 },
-    Delhi: { lat: 28.6139, lng: 77.2090 },
-    Mumbai: { lat: 19.0760, lng: 72.8777 },
-    Jaipur: { lat: 26.9124, lng: 75.7873 },
-    Hyderabad: { lat: 17.3850, lng: 78.4867 },
-    Pune: { lat: 18.5204, lng: 73.8567 },
-    Ahmedabad: { lat: 23.0225, lng: 72.5714 },
-    Lucknow: { lat: 26.8467, lng: 80.9462 },
-    Chennai: { lat: 13.0827, lng: 80.2707 },
-    Kolkata: { lat: 22.5726, lng: 88.3639 },
-    Chandigarh: { lat: 30.7333, lng: 76.7794 },
-  };
-
-  const loadTrafficData = async () => {
+  const loadTrafficData = useCallback(async () => {
     setIsLoading(true);
-    const coords = cityCoordinates[selectedCity] || cityCoordinates['Bengaluru'];
+    const coords = CITY_COORDINATES[selectedCity] || CITY_COORDINATES['Bengaluru'];
     try {
       const [trafficRes, incidentsRes] = await Promise.all([
         fetch(`/api/traffic?city=${selectedCity}&lat=${coords.lat}&lng=${coords.lng}`),
@@ -67,11 +67,11 @@ export default function LiveTrafficPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedCity]);
 
   useEffect(() => {
     loadTrafficData();
-  }, [selectedCity]);
+  }, [loadTrafficData]);
 
   // Filter incidents
   const filteredIncidents = incidents.filter((inc) => {
@@ -104,7 +104,7 @@ export default function LiveTrafficPage() {
             onChange={(e) => setSelectedCity(e.target.value)}
             className="px-3 py-2 rounded-xl text-xs font-semibold bg-card border border-border text-foreground"
           >
-            {Object.keys(cityCoordinates).map((c) => (
+            {Object.keys(CITY_COORDINATES).map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>
@@ -219,7 +219,7 @@ export default function LiveTrafficPage() {
 
         <div className="h-[360px] sm:h-[440px] lg:h-[480px] w-full rounded-2xl overflow-hidden border border-border shadow-inner">
           <MapWrapper
-            center={cityCoordinates[selectedCity] || cityCoordinates['Bengaluru']}
+            center={CITY_COORDINATES[selectedCity] || CITY_COORDINATES['Bengaluru']}
             zoom={12}
             incidents={filteredIncidents}
             showIncidents={true}

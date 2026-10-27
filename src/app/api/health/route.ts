@@ -10,11 +10,11 @@ export async function GET() {
     version: '1.0.0',
     timestamp: new Date().toISOString(),
     providers: {
-      maps: 'OpenStreetMap (Leaflet)',
-      traffic: trafficKeyPresent ? 'TomTom Live Traffic API' : 'Synthetic Traffic Physics Engine (DEMO mode)',
-      routing: trafficKeyPresent ? 'TomTom Routing API' : 'Multi-Objective Graph Routing Engine',
+      maps: 'OpenStreetMap (Leaflet Raster Tiles)',
+      traffic: trafficKeyPresent ? 'TomTom Live Traffic API' : 'QuantumRoute Urban Velocity Physics Model (DEMO mode)',
+      routing: trafficKeyPresent ? 'TomTom Routing API' : 'Open Source Routing Machine (OSRM) Road Engine',
       weather: 'Open-Meteo Public API',
-      fuelPrices: fuelKeyPresent ? 'IndianAPI Live Feed' : 'City Regulatory Benchmark Tariffs',
+      fuelPrices: 'India Petroleum API (PPAC/MoPNG) & Regulatory Benchmark Tariffs',
       optimizationEngine: 'Internal Classical & Quantum-Inspired Metaheuristics (QIGA)',
     },
     capabilities: [

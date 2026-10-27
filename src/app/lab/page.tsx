@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { QuantumConvergenceChart } from '@/components/QuantumConvergenceChart';
 import { StatusBadge } from '@/components/StatusBadge';
 import { AlgorithmResult, OptimizationObjective, VehicleType } from '@/lib/types';
@@ -43,7 +43,7 @@ export default function OptimizationLabPage() {
   const [selectedChartMetric, setSelectedChartMetric] = useState<'fitness' | 'cost' | 'diversity'>('fitness');
   const [showAdvancedMath, setShowAdvancedMath] = useState<boolean>(false);
 
-  const runOptimizationComparison = async () => {
+  const runOptimizationComparison = useCallback(async () => {
     setIsRunning(true);
     try {
       const res = await fetch('/api/optimization/run', {
@@ -72,11 +72,11 @@ export default function OptimizationLabPage() {
     } finally {
       setIsRunning(false);
     }
-  };
+  }, [origin, destination, vehicleType, objective, populationSize, generations, mutationRate, gridDensity]);
 
   useEffect(() => {
     runOptimizationComparison();
-  }, []);
+  }, [runOptimizationComparison]);
 
   const qigaResult = results.find((r) => r.algorithmId === 'qiga');
   const gaResult = results.find((r) => r.algorithmId === 'genetic');

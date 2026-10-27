@@ -1,3 +1,21 @@
+/**
+ * Classical Genetic Algorithm (GA) Metaheuristic
+ * ===============================================
+ * 
+ * ROLE IN ACADEMIC BENCHMARKING:
+ * ------------------------------
+ * Classical GAs emulate Darwinian natural selection through population-based evolutionary cycles:
+ *   1. Chromosome Encoding: Integer vector [choice_layer_1, choice_layer_2, ..., choice_layer_L]
+ *   2. Fitness Evaluation: Fitness = 1000 / (1 + CompositeCostScore J(r))
+ *   3. Selection: Binary Tournament selection favoring fitter candidate routes
+ *   4. Crossover: Two-point crossover (probability p_c ≈ 0.85) exchanging sub-corridor genes
+ *   5. Mutation: Stochastic gene mutation (probability p_m ≈ 0.12) to inject genetic diversity
+ *   6. Elitism: Preserves the top 2 solutions unchanged into the next generation.
+ * 
+ * When contrasted against QIGA, classical GA lacks superposition and requires larger population sizes
+ * (e.g. 30-50+ individuals) and higher iterations to prevent premature convergence into local minima.
+ */
+
 import { RoadNetworkGraph, GraphEdge } from './graph';
 import { ObjectiveWeights, VehicleProfile, AlgorithmConvergenceStep } from '../types';
 import { calculateConsumptionAndCost } from './vehicleModels';
