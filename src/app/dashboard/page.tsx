@@ -507,11 +507,11 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="relative flex flex-col md:flex-row h-[calc(100vh-4rem)] overflow-hidden bg-background">
+    <div className="relative flex flex-col md:flex-row h-[calc(100vh-3.5rem)] overflow-hidden bg-background">
       {/* DESKTOP SIDE PANEL (Compact, Uncluttered, Maximize Map, Collapsible on Tablet/Desktop) */}
       <div className={`hidden ${isSidebarCollapsed ? 'md:hidden' : 'md:flex'} w-[340px] lg:w-[380px] xl:w-[420px] flex-col h-full bg-card border-r border-border shrink-0 z-20 overflow-hidden shadow-sm transition-all duration-300`}>
-        {/* Top Input Section */}
-        <div className="p-4 border-b border-border">
+        {/* Top Input Section - Fixed in place while route cards scroll underneath */}
+        <div className="p-4 border-b border-border shrink-0 bg-card z-10 shadow-xs">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <h2 className="text-sm font-bold text-foreground flex items-center gap-1.5">
@@ -536,8 +536,8 @@ export default function DashboardPage() {
           {renderRouteInputs()}
         </div>
 
-        {/* Route Alternatives List with Loading Skeletons */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        {/* Route Alternatives List - Independently Scrollable Container */}
+        <div className="flex-1 overflow-y-auto min-h-0 p-4 space-y-3">
           <div className="flex items-center justify-between text-xs text-muted-foreground font-semibold">
             <span>Route Alternatives ({routes.length})</span>
             {selectedRoute && (
@@ -763,15 +763,15 @@ export default function DashboardPage() {
 
         {/* MOBILE DRAGGABLE BOTTOM ROUTE PANEL */}
         <div
-          className={`md:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border shadow-2xl rounded-t-3xl transition-all duration-300 ${
-            isMobileSheetExpanded ? 'max-h-[82vh] overflow-y-auto' : 'max-h-36 overflow-hidden'
+          className={`md:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border shadow-2xl rounded-t-3xl transition-all duration-300 flex flex-col ${
+            isMobileSheetExpanded ? 'h-[85vh] max-h-[85vh]' : 'max-h-36 overflow-hidden'
           }`}
         >
           {/* Draggable Handle */}
           <button
             type="button"
             onClick={() => setIsMobileSheetExpanded(!isMobileSheetExpanded)}
-            className="w-full py-2.5 flex flex-col items-center cursor-pointer group"
+            className="w-full py-2.5 shrink-0 flex flex-col items-center cursor-pointer group"
             aria-label="Toggle Route Panel"
           >
             <div className="w-12 h-1.5 rounded-full bg-muted-foreground/30 group-hover:bg-quantum-500 transition-colors" />
@@ -781,9 +781,9 @@ export default function DashboardPage() {
             </div>
           </button>
 
-          <div className="p-4 pt-1 space-y-4">
-            {/* When collapsed on mobile, show quick one-line trip summary */}
-            {!isMobileSheetExpanded && selectedRoute && (
+          {/* When collapsed on mobile, show quick one-line trip summary */}
+          {!isMobileSheetExpanded && selectedRoute && (
+            <div className="px-4 pb-4 pt-1">
               <div className="flex items-center justify-between pb-1 gap-2 min-w-0">
                 <div className="min-w-0 flex-1">
                   <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider block">Selected Route</span>
@@ -800,14 +800,19 @@ export default function DashboardPage() {
                   </p>
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Full Expanded Mobile Panel Controls */}
-            {isMobileSheetExpanded && (
-              <div className="space-y-4">
+          {/* Full Expanded Mobile Panel: Fixed Inputs at Top + Scrollable Route Cards */}
+          {isMobileSheetExpanded && (
+            <>
+              {/* Fixed Inputs (Vehicle Selector, Source, Destination, CTA) */}
+              <div className="shrink-0 px-4 pb-3 border-b border-border/70 bg-card/95 backdrop-blur-md z-10">
                 {renderRouteInputs()}
+              </div>
 
-                {/* Mobile Route Alternatives */}
+              {/* Scrollable Route Alternatives & Turn-by-Turn */}
+              <div className="flex-1 overflow-y-auto min-h-0 p-4 space-y-3">
                 <div className="space-y-2.5">
                   <span className="text-xs font-bold text-foreground block">
                     Route Alternatives ({routes.length})
@@ -847,8 +852,8 @@ export default function DashboardPage() {
                   </div>
                 )}
               </div>
-            )}
-          </div>
+            </>
+          )}
         </div>
       </div>
     </div>

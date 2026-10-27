@@ -30,17 +30,22 @@ export function RouteCard({ route, isSelected, onSelect }: RouteCardProps) {
     <div
       onClick={onSelect}
       className={cn(
-        'group relative p-3.5 sm:p-4 rounded-2xl border transition-all duration-200 cursor-pointer text-left w-full min-w-0',
+        'group relative p-3.5 sm:p-4 rounded-2xl border transition-all duration-200 cursor-pointer text-left w-full min-w-0 overflow-hidden',
         isSelected
-          ? 'bg-card border-quantum-500 ring-2 ring-quantum-500/30 shadow-md'
+          ? 'bg-gradient-to-br from-quantum-500/10 via-card to-card dark:from-quantum-500/15 dark:via-card dark:to-card border-quantum-500 ring-2 ring-quantum-500/50 shadow-lg shadow-quantum-500/10'
           : 'bg-card border-border hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs'
       )}
     >
+      {/* Left glowing accent indicator bar for the selected card */}
+      {isSelected && (
+        <div className="absolute left-0 top-3 bottom-3 w-1.5 rounded-r-full bg-quantum-500 shadow-sm shadow-quantum-500/60" />
+      )}
+
       {/* Top Row: Route Status & Recommendation */}
       <div className="flex items-center justify-between gap-2 mb-2 min-w-0">
         <div className="flex items-center gap-1.5 shrink-0">
           {route.isRecommended ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-quantum-500 text-white shrink-0">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-quantum-500 text-white shadow-xs shrink-0">
               <Sparkles className="h-3 w-3" /> Recommended
             </span>
           ) : (
@@ -62,17 +67,20 @@ export function RouteCard({ route, isSelected, onSelect }: RouteCardProps) {
           <div
             className={cn(
               'h-4 w-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors',
-              isSelected ? 'border-quantum-600 bg-quantum-600' : 'border-slate-300 dark:border-slate-600'
+              isSelected ? 'border-quantum-600 bg-quantum-600 shadow-xs' : 'border-slate-300 dark:border-slate-600'
             )}
           >
             {isSelected && <Check className="h-2.5 w-2.5 text-white stroke-[3]" />}
           </div>
-          <h3 className="text-xs sm:text-sm font-bold text-foreground truncate" title={route.name}>
+          <h3 className={cn('text-xs sm:text-sm font-bold truncate', isSelected ? 'text-foreground' : 'text-foreground/90')} title={route.name}>
             {route.name}
           </h3>
         </div>
 
-        <span className="text-base sm:text-lg font-extrabold text-foreground shrink-0 whitespace-nowrap">
+        <span className={cn(
+          'text-base sm:text-lg font-extrabold shrink-0 whitespace-nowrap',
+          isSelected ? 'text-quantum-600 dark:text-quantum-400 font-black' : 'text-foreground'
+        )}>
           {formatDuration(route.durationMin)}
         </span>
       </div>
@@ -81,28 +89,28 @@ export function RouteCard({ route, isSelected, onSelect }: RouteCardProps) {
 
       {/* 4 KPI Metrics: 2 columns on mobile/compact panels, 4 columns on wider displays so route cards NEVER become too narrow */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 pt-3 border-t border-border text-xs">
-        <div className="p-2 rounded-xl bg-muted/60 flex flex-col justify-center">
+        <div className={cn('p-2 rounded-xl flex flex-col justify-center transition-colors', isSelected ? 'bg-quantum-500/10 border border-quantum-500/20' : 'bg-muted/60')}>
           <span className="text-[9px] sm:text-[10px] text-muted-foreground font-medium uppercase tracking-wider block">ETA</span>
           <span className="font-bold text-foreground text-xs sm:text-sm truncate">
             {new Date(Date.now() + route.durationMin * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
 
-        <div className="p-2 rounded-xl bg-muted/60 flex flex-col justify-center">
+        <div className={cn('p-2 rounded-xl flex flex-col justify-center transition-colors', isSelected ? 'bg-quantum-500/10 border border-quantum-500/20' : 'bg-muted/60')}>
           <span className="text-[9px] sm:text-[10px] text-muted-foreground font-medium uppercase tracking-wider block">Distance</span>
           <span className="font-bold text-foreground text-xs sm:text-sm truncate">
             {formatDistance(route.distanceKm)}
           </span>
         </div>
 
-        <div className="p-2 rounded-xl bg-muted/60 flex flex-col justify-center">
+        <div className={cn('p-2 rounded-xl flex flex-col justify-center transition-colors', isSelected ? 'bg-quantum-500/10 border border-quantum-500/20' : 'bg-muted/60')}>
           <span className="text-[9px] sm:text-[10px] text-muted-foreground font-medium uppercase tracking-wider block">Est. Cost</span>
           <span className="font-bold text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm truncate">
             {formatCurrency(route.fuelCostInr)}
           </span>
         </div>
 
-        <div className="p-2 rounded-xl bg-muted/60 flex flex-col justify-center">
+        <div className={cn('p-2 rounded-xl flex flex-col justify-center transition-colors', isSelected ? 'bg-quantum-500/10 border border-quantum-500/20' : 'bg-muted/60')}>
           <span className="text-[9px] sm:text-[10px] text-muted-foreground font-medium uppercase tracking-wider block">Emissions</span>
           <span className="font-bold text-quantum-600 dark:text-quantum-400 text-xs sm:text-sm truncate">
             {formatEmissions(route.emissionsKg)}

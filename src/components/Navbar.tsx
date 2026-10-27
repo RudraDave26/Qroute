@@ -108,23 +108,23 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 transition-colors">
-      <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-3 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto flex h-14 items-center justify-between px-3 sm:px-6 lg:px-8">
         {/* Brand */}
-        <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-          <div className="relative flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br from-navy-900 via-navy-800 to-quantum-800 text-white shadow-md shadow-quantum-500/20 group-hover:scale-105 transition-transform duration-300 shrink-0">
-            <Atom className="h-4 w-4 sm:h-5 sm:w-5 text-quantum-300 animate-spin-slow" />
+        <Link href="/" className="flex items-center gap-2 group shrink-0">
+          <div className="relative flex items-center justify-center h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-gradient-to-br from-navy-900 via-navy-800 to-quantum-800 text-white shadow-md shadow-quantum-500/20 group-hover:scale-105 transition-transform duration-300 shrink-0">
+            <Atom className="h-4 w-4 text-quantum-300 animate-spin-slow" />
             <div className="absolute -inset-0.5 rounded-xl bg-quantum-400 opacity-20 blur-xs group-hover:opacity-40 transition-opacity" />
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-base sm:text-lg tracking-tight bg-gradient-to-r from-navy-900 to-navy-700 dark:from-white dark:to-slate-200 bg-clip-text text-transparent whitespace-nowrap">
+              <span className="font-bold text-sm sm:text-base tracking-tight bg-gradient-to-r from-navy-900 to-navy-700 dark:from-white dark:to-slate-200 bg-clip-text text-transparent whitespace-nowrap">
                 QuantumRoute
               </span>
-              <span className="px-1.5 py-0.5 text-[10px] font-bold tracking-wider rounded bg-quantum-500/15 text-quantum-700 dark:text-quantum-300 border border-quantum-500/30 shrink-0">
+              <span className="px-1.5 py-0.5 text-[9px] font-bold tracking-wider rounded bg-quantum-500/15 text-quantum-700 dark:text-quantum-300 border border-quantum-500/30 shrink-0">
                 AI
               </span>
             </div>
-            <span className="text-[9px] sm:text-[10px] font-medium text-muted-foreground uppercase tracking-wider -mt-0.5 sm:-mt-1 whitespace-nowrap">
+            <span className="text-[8px] sm:text-[9px] font-medium text-muted-foreground uppercase tracking-wider -mt-0.5 whitespace-nowrap">
               By MVP MAKERS
             </span>
           </div>
@@ -142,14 +142,14 @@ export function Navbar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap shrink-0',
+                    'flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs xl:text-sm font-medium transition-all duration-200 whitespace-nowrap shrink-0',
                     isActive
                       ? 'bg-primary text-primary-foreground shadow-xs'
                       : 'text-foreground/80 hover:text-foreground hover:bg-muted',
                     item.isHighlight && !isActive && 'text-quantum-600 dark:text-quantum-400 hover:bg-quantum-500/10'
                   )}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-3.5 w-3.5" />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -166,14 +166,14 @@ export function Navbar() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-all duration-200 whitespace-nowrap shrink-0',
+                    'flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-medium transition-all duration-200 whitespace-nowrap shrink-0',
                     isActive
                       ? 'bg-primary text-primary-foreground shadow-xs'
                       : 'text-foreground/80 hover:text-foreground hover:bg-muted',
                     item.isHighlight && !isActive && 'text-quantum-600 dark:text-quantum-400 hover:bg-quantum-500/10'
                   )}
                 >
-                  <Icon className="h-3.5 w-3.5 xl:h-4 xl:w-4" />
+                  <Icon className="h-3.5 w-3.5" />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -185,7 +185,7 @@ export function Navbar() {
                 type="button"
                 onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
                 className={cn(
-                  'flex items-center gap-1 px-2.5 xl:px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-all duration-200 whitespace-nowrap shrink-0',
+                  'flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium transition-all duration-200 whitespace-nowrap shrink-0',
                   isSecondaryActive || moreDropdownOpen
                     ? 'bg-primary/10 text-primary dark:text-quantum-400 font-semibold'
                     : 'text-foreground/80 hover:text-foreground hover:bg-muted'
@@ -235,18 +235,18 @@ export function Navbar() {
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             onClick={toggleTheme}
             aria-label="Toggle theme"
-            className="p-2 rounded-xl text-foreground/80 hover:text-foreground hover:bg-muted transition-colors border border-border/60 shrink-0"
+            className="p-1.5 rounded-xl text-foreground/80 hover:text-foreground hover:bg-muted transition-colors border border-border/60 shrink-0"
           >
             {isDark ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-navy-800" />}
           </button>
 
           <Link
             href="/dashboard"
-            className="hidden md:inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-all shrink-0"
+            className="hidden md:inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-xl text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs transition-all shrink-0"
           >
             <MapPin className="h-3.5 w-3.5 text-quantum-300" />
             <span>Plan Route</span>
@@ -255,7 +255,7 @@ export function Navbar() {
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl text-foreground hover:bg-muted transition-colors shrink-0"
+            className="lg:hidden p-1.5 rounded-xl text-foreground hover:bg-muted transition-colors shrink-0"
             aria-label="Open mobile menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -268,10 +268,10 @@ export function Navbar() {
       {mobileMenuOpen && (
         <>
           <div
-            className="fixed inset-0 top-16 bg-black/50 backdrop-blur-xs z-40 lg:hidden animate-in fade-in-0 duration-200"
+            className="fixed inset-0 top-14 bg-black/50 backdrop-blur-xs z-40 lg:hidden animate-in fade-in-0 duration-200"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="fixed top-16 left-0 right-0 max-h-[calc(100vh-4rem)] overflow-y-auto bg-card border-b border-border shadow-2xl z-50 p-4 space-y-1 lg:hidden animate-in slide-in-from-top-2 duration-200">
+          <div className="fixed top-14 left-0 right-0 max-h-[calc(100vh-3.5rem)] overflow-y-auto bg-card border-b border-border shadow-2xl z-50 p-4 space-y-1 lg:hidden animate-in slide-in-from-top-2 duration-200">
             <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-3 py-1">
               Navigation Menu
             </div>

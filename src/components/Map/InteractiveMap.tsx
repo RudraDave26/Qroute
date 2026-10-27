@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { LatLng, RouteAlternative, TrafficIncident, EVChargingStation } from '@/lib/types';
-import { formatCurrency, formatDistance, formatDuration } from '@/lib/utils';
+import { formatCurrency, formatDistance, formatDuration, cn } from '@/lib/utils';
 import {
   AlertCircle,
   AlertTriangle,
@@ -12,6 +12,8 @@ import {
   Plus,
   Minus,
   Crosshair,
+  Layers,
+  ChevronDown,
 } from 'lucide-react';
 
 interface MapStop {
@@ -143,6 +145,108 @@ function MapFloatingControls({
       >
         <Crosshair className="h-4 w-4 text-quantum-600 dark:text-quantum-400 transition-transform duration-300 group-hover:rotate-45" />
       </button>
+    </div>
+  );
+}
+
+// Compact, elegant legend for traffic severity colours, incident markers & route corridors
+function MapLegendControl() {
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  return (
+    <div className="leaflet-bottom leaflet-left pointer-events-auto mb-36 md:mb-4 ml-3 z-[1000]">
+      <div className="bg-card/95 backdrop-blur-md border border-border shadow-md rounded-xl overflow-hidden transition-all duration-200 max-w-[210px] sm:max-w-[230px]">
+        {/* Header toggle button */}
+        <button
+          type="button"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full px-2.5 py-1.5 flex items-center justify-between gap-2 text-[11px] font-bold text-foreground hover:bg-muted/60 transition-colors"
+          title={isExpanded ? 'Collapse Legend' : 'Expand Legend'}
+          aria-expanded={isExpanded}
+        >
+          <div className="flex items-center gap-1.5">
+            <Layers className="h-3.5 w-3.5 text-quantum-600 dark:text-quantum-400" />
+            <span>Map Legend</span>
+          </div>
+          <ChevronDown className={cn('h-3.5 w-3.5 text-muted-foreground transition-transform duration-200', isExpanded ? 'rotate-180' : '')} />
+        </button>
+
+        {/* Collapsible Content */}
+        {isExpanded && (
+          <div className="p-2.5 pt-1 space-y-2 border-t border-border/60 text-[10px]">
+            {/* Traffic Delay Severity */}
+            <div>
+              <span className="font-bold text-muted-foreground uppercase tracking-wider text-[9px] block mb-1">
+                Traffic Delay
+              </span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-[#10b981] shrink-0" />
+                  <span className="text-foreground font-medium">Smooth (&lt;15% delay)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-[#f59e0b] shrink-0" />
+                  <span className="text-foreground font-medium">Moderate (15–30%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-[#ef4444] shrink-0" />
+                  <span className="text-foreground font-medium">Heavy (&gt;30% delay)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Map & Incident Markers */}
+            <div>
+              <span className="font-bold text-muted-foreground uppercase tracking-wider text-[9px] block mb-1">
+                Markers
+              </span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full bg-emerald-500 text-white font-bold text-[8px] flex items-center justify-center shrink-0">
+                    A
+                  </span>
+                  <span className="text-foreground font-medium">Departure Origin</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full bg-rose-500 text-white font-bold text-[8px] flex items-center justify-center shrink-0">
+                    B
+                  </span>
+                  <span className="text-foreground font-medium">Destination</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-md bg-amber-500 text-white font-black text-[9px] flex items-center justify-center shrink-0">
+                    !
+                  </span>
+                  <span className="text-foreground font-medium">Incident / Hazard</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full bg-cyan-500 text-white font-bold text-[8px] flex items-center justify-center shrink-0">
+                    ⚡
+                  </span>
+                  <span className="text-foreground font-medium">EV Fast Hub</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Route Corridors */}
+            <div className="pt-1 border-t border-border/40">
+              <span className="font-bold text-muted-foreground uppercase tracking-wider text-[9px] block mb-1">
+                Corridors
+              </span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="h-1 w-4 rounded-full bg-cyan-500 shrink-0 shadow-xs shadow-cyan-500/50" />
+                  <span className="text-foreground font-medium">Selected Route</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="h-0.5 w-4 border-b border-dashed border-slate-400 shrink-0" />
+                  <span className="text-foreground font-medium">Alternative</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -299,6 +403,9 @@ export default function InteractiveMap({
           routes={routes}
           selectedRouteId={selectedRouteId}
         />
+
+        {/* Compact Legend for Traffic Colours and Incident Markers */}
+        <MapLegendControl />
 
         {/* Origin Marker (Point A) */}
         {origin && originIcon && (
