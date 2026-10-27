@@ -145,3 +145,30 @@ export interface TrafficFlowSegment {
   coordinates: [number, number][];
   status: 'smooth' | 'moderate' | 'congested' | 'blocked';
 }
+
+export interface AirQualityData {
+  usAqi: number;
+  europeanAqi: number;
+  pm25: number;
+  pm10: number;
+  no2: number;
+  category: 'Good' | 'Moderate' | 'Unhealthy for Sensitive' | 'Unhealthy' | 'Very Unhealthy' | 'Hazardous';
+  healthRecommendation: string;
+  isLive: boolean;
+  timestamp: string;
+}
+
+export interface EVChargingStation {
+  id: string;
+  title: string;
+  operator: string;
+  address: string;
+  lat: number;
+  lng: number;
+  powerKw: number;
+  connectionType: 'CCS2' | 'Type 2' | 'GB/T' | 'CHAdeMO' | 'Fast DC';
+  numberOfPoints: number;
+  isOperational: boolean;
+  distanceKm?: number;
+  dataSource: 'OpenChargeMap API' | 'Verified National EV Registry';
+}

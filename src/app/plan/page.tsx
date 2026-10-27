@@ -319,20 +319,46 @@ export default function AdvancedRoutePlannerPage() {
           {/* Transparent Provider Capability Breakdown */}
           <div className="p-5 rounded-2xl bg-card border border-border space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <Info className="h-3.5 w-3.5 text-quantum-500" /> Provider vs Algorithm Engine
+              <Info className="h-3.5 w-3.5 text-quantum-500" /> Integrated Live Data Providers
             </h3>
             <div className="space-y-2 text-xs">
-              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-navy-900 border border-border/50">
-                <p className="font-semibold text-foreground">TomTom Routing Provider</p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
-                  Supplies road topology geometry, free-flow vs traffic-delayed durations, and highway toll road flags.
+              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-navy-900 border border-border/50 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-foreground">OpenStreetMap (OSM)</span>
+                  <StatusBadge status="LIVE" showIcon={false} className="py-0 px-1 text-[9px]" />
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Geospatial road network topology, road classifications, and Leaflet interactive tiles.
                 </p>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-navy-900 border border-border/50">
-                <p className="font-semibold text-foreground">QuantumRoute Metaheuristic Engine</p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
-                  Executes QIGA multi-objective scoring $J(r)$, EV battery consumption modeling, and Pareto-optimal trade-offs.
+              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-navy-900 border border-border/50 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-foreground">Open-Meteo Air Quality API</span>
+                  <StatusBadge status="LIVE" showIcon={false} className="py-0 px-1 text-[9px]" />
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Real-time US & European AQI, PM2.5, PM10, and NO₂ for eco-routing and passenger health analysis.
+                </p>
+              </div>
+
+              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-navy-900 border border-border/50 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-foreground">India Petroleum API (PPAC)</span>
+                  <StatusBadge status="LIVE" showIcon={false} className="py-0 px-1 text-[9px]" />
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Official daily petrol and diesel metro rates from the Ministry of Petroleum and Natural Gas.
+                </p>
+              </div>
+
+              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-navy-900 border border-border/50 space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-foreground">Open Charge Map (OCM)</span>
+                  <StatusBadge status="LIVE" showIcon={false} className="py-0 px-1 text-[9px]" />
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  EV fast DC charging hubs (50-120 kW), plug types (CCS2, Type-2), and operator availability.
                 </p>
               </div>
             </div>

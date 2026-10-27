@@ -71,41 +71,59 @@ export function Footer() {
             <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider">Data Providers</h4>
             <ul className="space-y-2 text-xs text-muted-foreground">
               <li className="flex items-center gap-1.5">
-                <span>Map Tiles:</span>
+                <span>Maps:</span>
                 <a
-                  href="https://www.openstreetmap.org/copyright"
+                  href="https://www.openstreetmap.org/"
                   target="_blank"
                   rel="noreferrer"
                   className="underline hover:text-foreground inline-flex items-center gap-0.5"
                 >
-                  © OpenStreetMap contributors <ExternalLink className="h-2.5 w-2.5" />
+                  OpenStreetMap <ExternalLink className="h-2.5 w-2.5" />
                 </a>
               </li>
               <li className="flex items-center gap-1.5">
-                <span>Traffic & Routing:</span>
+                <span>Air Quality & Weather:</span>
+                <a
+                  href="https://open-meteo.com/en/docs/air-quality-api"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline hover:text-foreground inline-flex items-center gap-0.5"
+                >
+                  Open-Meteo AQI API <ExternalLink className="h-2.5 w-2.5" />
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5">
+                <span>India Fuel Tariffs:</span>
+                <a
+                  href="https://india-petroleum-api.vercel.app/docs"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline hover:text-foreground inline-flex items-center gap-0.5"
+                >
+                  India Petroleum API (PPAC) <ExternalLink className="h-2.5 w-2.5" />
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5">
+                <span>EV Charging Hubs:</span>
+                <a
+                  href="https://openchargemap.org/site/develop/api"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline hover:text-foreground inline-flex items-center gap-0.5"
+                >
+                  Open Charge Map API <ExternalLink className="h-2.5 w-2.5" />
+                </a>
+              </li>
+              <li className="flex items-center gap-1.5">
+                <span>Traffic Flow:</span>
                 <a
                   href="https://developer.tomtom.com/"
                   target="_blank"
                   rel="noreferrer"
                   className="underline hover:text-foreground inline-flex items-center gap-0.5"
                 >
-                  TomTom Traffic API <ExternalLink className="h-2.5 w-2.5" />
+                  TomTom Traffic <ExternalLink className="h-2.5 w-2.5" />
                 </a>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <span>Weather Data:</span>
-                <a
-                  href="https://open-meteo.com/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline hover:text-foreground inline-flex items-center gap-0.5"
-                >
-                  Open-Meteo <ExternalLink className="h-2.5 w-2.5" />
-                </a>
-              </li>
-              <li className="flex items-center gap-1.5">
-                <span>Fuel Tariffs:</span>
-                <span>OMC Index & Retail Tariffs</span>
               </li>
             </ul>
           </div>

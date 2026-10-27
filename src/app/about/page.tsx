@@ -220,11 +220,95 @@ export default function AboutResearchPage() {
         </div>
       </section>
 
-      {/* 6. References & Literature */}
+      {/* 6. Integrated APIs & Live Infrastructure */}
       <section className="space-y-4">
         <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
           <span className="h-7 w-7 rounded-lg bg-navy-900 text-white flex items-center justify-center text-xs">
             6
+          </span>
+          Integrated APIs & Live Geospatial Services
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+          <div className="p-4 rounded-xl bg-card border border-border space-y-1.5">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-foreground">1. OpenStreetMap (OSM)</h4>
+              <a
+                href="https://www.openstreetmap.org/"
+                target="_blank"
+                rel="noreferrer"
+                className="text-quantum-600 dark:text-quantum-400 hover:underline flex items-center gap-1 font-semibold"
+              >
+                <span>Docs</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <p className="text-muted-foreground leading-relaxed">
+              Global open geographic database supplying base map tiles, road network topology, and Nominatim place search.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-card border border-border space-y-1.5">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-foreground">2. Open-Meteo Air Quality API</h4>
+              <a
+                href="https://open-meteo.com/en/docs/air-quality-api"
+                target="_blank"
+                rel="noreferrer"
+                className="text-quantum-600 dark:text-quantum-400 hover:underline flex items-center gap-1 font-semibold"
+              >
+                <span>Docs</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <p className="text-muted-foreground leading-relaxed">
+              Real-time atmospheric modeling providing European AQI, US AQI, PM2.5, PM10, and Nitrogen Dioxide for eco-routing.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-card border border-border space-y-1.5">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-foreground">3. India Petroleum API</h4>
+              <a
+                href="https://india-petroleum-api.vercel.app/docs"
+                target="_blank"
+                rel="noreferrer"
+                className="text-quantum-600 dark:text-quantum-400 hover:underline flex items-center gap-1 font-semibold"
+              >
+                <span>Docs</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <p className="text-muted-foreground leading-relaxed">
+              Daily metro petrol and diesel rates directly fetched from PPAC, Ministry of Petroleum and Natural Gas, Government of India.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-card border border-border space-y-1.5">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-foreground">4. Open Charge Map API</h4>
+              <a
+                href="https://openchargemap.org/site/develop/api"
+                target="_blank"
+                rel="noreferrer"
+                className="text-quantum-600 dark:text-quantum-400 hover:underline flex items-center gap-1 font-semibold"
+              >
+                <span>Docs</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <p className="text-muted-foreground leading-relaxed">
+              Global registry of Electric Vehicle (EV) public and fast DC charging points, power ratings in kW, and connector types.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. References & Literature */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+          <span className="h-7 w-7 rounded-lg bg-navy-900 text-white flex items-center justify-center text-xs">
+            7
           </span>
           Academic & Technical References
         </h2>

@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { LatLng, RouteAlternative, TrafficIncident } from '@/lib/types';
+import { LatLng, RouteAlternative, TrafficIncident, EVChargingStation } from '@/lib/types';
 import { formatCurrency, formatDistance, formatDuration } from '@/lib/utils';
-import { AlertCircle, AlertTriangle, Construction, Flame, ShieldAlert } from 'lucide-react';
+import { AlertCircle, AlertTriangle, Construction, Flame, ShieldAlert, Zap, ExternalLink } from 'lucide-react';
 
 interface InteractiveMapProps {
   center?: LatLng;
@@ -17,6 +17,8 @@ interface InteractiveMapProps {
   onSelectRoute?: (routeId: string) => void;
   incidents?: TrafficIncident[];
   showIncidents?: boolean;
+  chargingStations?: EVChargingStation[];
+  showChargingStations?: boolean;
 }
 
 // Controller component to smoothly pan/fit bounds when routes or endpoints change
@@ -67,6 +69,8 @@ export default function InteractiveMap({
   onSelectRoute,
   incidents = [],
   showIncidents = true,
+  chargingStations = [],
+  showChargingStations = true,
 }: InteractiveMapProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -122,8 +126,35 @@ export default function InteractiveMap({
     });
   };
 
+  const chargingIcon = L.divIcon({
+    className: 'custom-div-icon',
+    html: `
+      <div style="background: linear-gradient(135deg, #059669, #0284c7); width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2.5px solid #ffffff; box-shadow: 0 4px 10px rgba(2,132,199,0.35);">
+        <span style="color: #ffffff; font-size: 12px; font-weight: bold;">⚡</span>
+      </div>
+    `,
+    iconSize: [26, 26],
+    iconAnchor: [13, 13],
+  });
+
+  const mapCenterLat = origin ? origin.lat : center.lat;
+  const mapCenterLng = origin ? origin.lng : center.lng;
+
   return (
     <div className="relative w-full h-full min-h-[450px] rounded-2xl overflow-hidden shadow-inner border border-border">
+      {/* OSM Direct Link Overlay in top right */}
+      <div className="absolute top-4 right-4 z-20 pointer-events-auto">
+        <a
+          href={`https://www.openstreetmap.org/#map=14/${mapCenterLat}/${mapCenterLng}`}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-card/90 backdrop-blur-md border border-border text-xs font-semibold text-foreground hover:bg-card shadow-md transition-all"
+        >
+          <span>Open in OpenStreetMap</span>
+          <ExternalLink className="h-3 w-3 text-muted-foreground" />
+        </a>
+      </div>
+
       <MapContainer
         center={[center.lat, center.lng]}
         zoom={zoom}
@@ -201,8 +232,36 @@ export default function InteractiveMap({
             </Marker>
           ))}
 
+        {/* EV Charging Stations (Open Charge Map) */}
+        {showChargingStations &&
+          chargingStations.map((st) => (
+            <Marker
+              key={st.id}
+              position={[st.lat, st.lng]}
+              icon={chargingIcon}
+            >
+              <Popup>
+                <div className="p-2 max-w-xs space-y-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                      ⚡ {st.powerKw} kW Fast DC
+                    </span>
+                    <span className="text-[10px] font-semibold text-slate-500">
+                      {st.connectionType}
+                    </span>
+                  </div>
+                  <p className="text-xs font-bold text-slate-900">{st.title}</p>
+                  <p className="text-[11px] text-slate-600 leading-snug">{st.address}</p>
+                  <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t">
+                    <span>Operator: {st.operator}</span>
+                    <span>{st.numberOfPoints} Bays</span>
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+
         {/* Route Polylines */}
-        {/* Render unselected routes first in background */}
         {routes
           .filter((r) => r.id !== selectedRouteId)
           .map((route, idx) => {
@@ -237,12 +296,11 @@ export default function InteractiveMap({
             );
           })}
 
-        {/* Render selected active route with prominent glow and thickness */}
+        {/* Render selected active route */}
         {routes
           .filter((r) => r.id === selectedRouteId)
           .map((route) => (
             <React.Fragment key={route.id}>
-              {/* Outer shadow / glow track */}
               <Polyline
                 positions={route.coordinates}
                 pathOptions={{
@@ -251,7 +309,6 @@ export default function InteractiveMap({
                   opacity: 0.35,
                 }}
               />
-              {/* Active inner core line */}
               <Polyline
                 positions={route.coordinates}
                 pathOptions={{

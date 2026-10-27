@@ -6,12 +6,15 @@ export async function GET(request: NextRequest) {
   const city = searchParams.get('city') || 'Bengaluru';
 
   try {
-    const prices = await getFuelPrices(city);
+    const result = await getFuelPrices(city);
     return NextResponse.json({
       city,
-      prices,
+      prices: result.prices,
+      attribution: result.attribution,
+      sourceDate: result.sourceDate,
+      isLive: result.isLive,
+      providerUrl: 'https://india-petroleum-api.vercel.app/docs',
       timestamp: new Date().toISOString(),
-      note: 'Prices reflect retail benchmarks and regulatory tariffs. Manual user overrides available in Settings.',
     });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch fuel prices' }, { status: 500 });

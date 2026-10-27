@@ -6,7 +6,16 @@ import { RouteCard } from '@/components/RouteCard';
 import { StatusBadge } from '@/components/StatusBadge';
 import { VehicleSelector } from '@/components/VehicleSelector';
 import { ObjectiveSelector } from '@/components/ObjectiveSelector';
-import { LatLng, RouteAlternative, TrafficIncident, VehicleType, OptimizationObjective, WeatherCondition } from '@/lib/types';
+import {
+  LatLng,
+  RouteAlternative,
+  TrafficIncident,
+  VehicleType,
+  OptimizationObjective,
+  WeatherCondition,
+  AirQualityData,
+  EVChargingStation,
+} from '@/lib/types';
 import { DEFAULT_VEHICLE_PROFILES } from '@/lib/algorithms/vehicleModels';
 import { PRESET_LOCATIONS } from '@/lib/providers/nominatim';
 import { saveRoute } from '@/lib/storage';
@@ -24,6 +33,9 @@ import {
   RefreshCw,
   Check,
   Zap,
+  Wind,
+  BatteryCharging,
+  Fuel,
 } from 'lucide-react';
 import { formatCurrency, formatDistance, formatDuration, formatEmissions } from '@/lib/utils';
 
@@ -50,12 +62,17 @@ export default function DashboardPage() {
   const [vehicleType, setVehicleType] = useState<VehicleType>('petrol');
   const [objective, setObjective] = useState<OptimizationObjective>('balanced');
   const [avoidTolls, setAvoidTolls] = useState(false);
+  const [showEVChargers, setShowEVChargers] = useState(true);
 
   // Results state
   const [routes, setRoutes] = useState<RouteAlternative[]>([]);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [incidents, setIncidents] = useState<TrafficIncident[]>([]);
   const [weather, setWeather] = useState<WeatherCondition | null>(null);
+  const [airQuality, setAirQuality] = useState<AirQualityData | null>(null);
+  const [chargingStations, setChargingStations] = useState<EVChargingStation[]>([]);
+  const [fuelInfo, setFuelInfo] = useState<{ petrol: number; diesel: number; isLive: boolean } | null>(null);
+
   const [isLoadingRoutes, setIsLoadingRoutes] = useState(false);
   const [isSearchingOrigin, setIsSearchingOrigin] = useState(false);
   const [isSearchingDest, setIsSearchingDest] = useState(false);
@@ -68,6 +85,9 @@ export default function DashboardPage() {
     fetchRouteData();
     fetchIncidentData();
     fetchWeatherData(origin.lat, origin.lng);
+    fetchAirQualityData(origin.lat, origin.lng);
+    fetchChargingData(origin.lat, origin.lng);
+    fetchFuelPriceData();
   }, []);
 
   // Fetch routes from API
@@ -125,6 +145,50 @@ export default function DashboardPage() {
     }
   };
 
+  const fetchAirQualityData = async (lat: number, lng: number) => {
+    try {
+      const res = await fetch(`/api/air-quality?lat=${lat}&lng=${lng}`);
+      if (res.ok) {
+        const data = await res.json();
+        setAirQuality(data.airQuality);
+      }
+    } catch (e) {
+      console.error('Failed to fetch air quality:', e);
+    }
+  };
+
+  const fetchChargingData = async (lat: number, lng: number) => {
+    try {
+      const res = await fetch(`/api/charging-stations?lat=${lat}&lng=${lng}`);
+      if (res.ok) {
+        const data = await res.json();
+        setChargingStations(data.stations || []);
+      }
+    } catch (e) {
+      console.error('Failed to fetch charging stations:', e);
+    }
+  };
+
+  const fetchFuelPriceData = async () => {
+    try {
+      const res = await fetch('/api/fuel-prices?city=Bengaluru');
+      if (res.ok) {
+        const data = await res.json();
+        const petrolQuote = data.prices?.find((p: any) => p.fuelType === 'petrol');
+        const dieselQuote = data.prices?.find((p: any) => p.fuelType === 'diesel');
+        if (petrolQuote && dieselQuote) {
+          setFuelInfo({
+            petrol: petrolQuote.priceInr,
+            diesel: dieselQuote.priceInr,
+            isLive: data.isLive,
+          });
+        }
+      }
+    } catch (e) {
+      console.error('Failed to fetch fuel prices:', e);
+    }
+  };
+
   // Autocomplete searches
   const handleOriginSearch = async (val: string) => {
     setOriginQuery(val);
@@ -179,6 +243,8 @@ export default function DashboardPage() {
           setOrigin(loc);
           setOriginQuery('Your Current Location');
           fetchWeatherData(userLat, userLng);
+          fetchAirQualityData(userLat, userLng);
+          fetchChargingData(userLat, userLng);
         },
         (err) => {
           alert('Unable to retrieve location: ' + err.message);
@@ -223,7 +289,8 @@ export default function DashboardPage() {
             <span className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <Navigation className="h-3.5 w-3.5 text-quantum-500" /> Route Navigation
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {/* Weather Chip */}
               {weather && (
                 <div
                   title={`Weather: ${weather.description}, Wind: ${weather.windSpeedKmh} km/h`}
@@ -231,9 +298,27 @@ export default function DashboardPage() {
                 >
                   <CloudSun className="h-3 w-3 text-amber-500" />
                   <span>{weather.temperatureC}°C</span>
-                  <StatusBadge status={weather.isLive ? 'LIVE' : 'DEMO'} showIcon={false} className="py-0 px-1 text-[9px]" />
                 </div>
               )}
+
+              {/* Air Quality Chip (Open-Meteo Air Quality API) */}
+              {airQuality && (
+                <div
+                  title={`Open-Meteo Air Quality: AQI ${airQuality.usAqi} (${airQuality.category}). PM2.5: ${airQuality.pm25} μg/m³`}
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] border font-semibold ${
+                    airQuality.usAqi <= 50
+                      ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
+                      : airQuality.usAqi <= 100
+                      ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800'
+                      : 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800'
+                  }`}
+                >
+                  <Wind className="h-3 w-3" />
+                  <span>AQI {airQuality.usAqi}</span>
+                  <StatusBadge status={airQuality.isLive ? 'LIVE' : 'DEMO'} showIcon={false} className="py-0 px-1 text-[8px]" />
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={() => setShowPreferences(!showPreferences)}
@@ -244,6 +329,19 @@ export default function DashboardPage() {
               </button>
             </div>
           </div>
+
+          {/* India Petroleum API live ticker banner */}
+          {fuelInfo && (
+            <div className="p-2 rounded-xl bg-slate-50 dark:bg-navy-900 border border-border flex items-center justify-between text-[11px]">
+              <div className="flex items-center gap-1 text-slate-600 dark:text-slate-300">
+                <Fuel className="h-3 w-3 text-quantum-500" />
+                <span>
+                  PPAC Fuel: Petrol <strong>₹{fuelInfo.petrol}/L</strong> • Diesel <strong>₹{fuelInfo.diesel}/L</strong>
+                </span>
+              </div>
+              <StatusBadge status={fuelInfo.isLive ? 'LIVE' : 'CACHED'} showIcon={false} className="py-0 px-1 text-[8px]" />
+            </div>
+          )}
 
           {/* Origin and Destination Search Inputs */}
           <div className="relative space-y-2">
@@ -277,6 +375,9 @@ export default function DashboardPage() {
                         setOrigin({ lat: item.lat, lng: item.lng, label: item.name });
                         setOriginQuery(item.name);
                         setOriginSuggestions([]);
+                        fetchWeatherData(item.lat, item.lng);
+                        fetchAirQualityData(item.lat, item.lng);
+                        fetchChargingData(item.lat, item.lng);
                       }}
                       className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/40 last:border-0"
                     >
@@ -344,6 +445,8 @@ export default function DashboardPage() {
                 setOriginQuery(PRESET_LOCATIONS[0].name);
                 setDestination(PRESET_LOCATIONS[1]);
                 setDestQuery(PRESET_LOCATIONS[1].name);
+                fetchAirQualityData(PRESET_LOCATIONS[0].lat, PRESET_LOCATIONS[0].lng);
+                fetchChargingData(PRESET_LOCATIONS[0].lat, PRESET_LOCATIONS[0].lng);
               }}
               className="px-2 py-0.5 rounded-md bg-muted hover:bg-muted/80 shrink-0"
             >
@@ -356,6 +459,8 @@ export default function DashboardPage() {
                 setOriginQuery(PRESET_LOCATIONS[5].name);
                 setDestination(PRESET_LOCATIONS[6]);
                 setDestQuery(PRESET_LOCATIONS[6].name);
+                fetchAirQualityData(PRESET_LOCATIONS[5].lat, PRESET_LOCATIONS[5].lng);
+                fetchChargingData(PRESET_LOCATIONS[5].lat, PRESET_LOCATIONS[5].lng);
               }}
               className="px-2 py-0.5 rounded-md bg-muted hover:bg-muted/80 shrink-0"
             >
@@ -376,7 +481,7 @@ export default function DashboardPage() {
                 onSelectObjective={(obj) => setObjective(obj)}
                 showWeightsTuner={false}
               />
-              <div className="flex items-center gap-2 pt-1 text-xs">
+              <div className="flex flex-wrap items-center gap-4 pt-1 text-xs">
                 <label className="flex items-center gap-1.5 cursor-pointer">
                   <input
                     type="checkbox"
@@ -385,6 +490,15 @@ export default function DashboardPage() {
                     className="rounded border-border text-quantum-500 focus:ring-quantum-500"
                   />
                   <span>Avoid Toll Roads</span>
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer font-medium text-emerald-700 dark:text-emerald-300">
+                  <input
+                    type="checkbox"
+                    checked={showEVChargers}
+                    onChange={(e) => setShowEVChargers(e.target.checked)}
+                    className="rounded border-border text-emerald-500 focus:ring-emerald-500"
+                  />
+                  <span>Show EV Chargers (Open Charge Map)</span>
                 </label>
               </div>
             </div>
@@ -511,9 +625,19 @@ export default function DashboardPage() {
 
             <div className="pointer-events-auto flex items-center gap-2 bg-card/95 backdrop-blur-md border border-border px-3 py-1.5 rounded-xl shadow-md text-xs">
               <StatusBadge status={selectedRoute.dataStatus} />
-              <span className="text-[11px] text-muted-foreground hidden sm:inline">
-                {selectedRoute.dataSource}
-              </span>
+              <button
+                type="button"
+                onClick={() => setShowEVChargers(!showEVChargers)}
+                className={`flex items-center gap-1 px-2 py-0.5 rounded-md font-semibold text-[11px] border transition-colors ${
+                  showEVChargers
+                    ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-400'
+                    : 'bg-muted text-muted-foreground'
+                }`}
+                title="Toggle Open Charge Map EV stations layer"
+              >
+                <BatteryCharging className="h-3.5 w-3.5" />
+                <span>EV Hubs ({chargingStations.length})</span>
+              </button>
             </div>
           </div>
         )}
@@ -530,6 +654,8 @@ export default function DashboardPage() {
             onSelectRoute={(id) => setSelectedRouteId(id)}
             incidents={incidents}
             showIncidents={true}
+            chargingStations={chargingStations}
+            showChargingStations={showEVChargers}
           />
         </div>
       </div>
