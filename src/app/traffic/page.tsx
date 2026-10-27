@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { StatusBadge } from '@/components/StatusBadge';
+import { MapWrapper } from '@/components/Map/MapWrapper';
 import { TrafficIncident, DataStatus } from '@/lib/types';
 import {
   Radio,
@@ -195,6 +196,36 @@ export default function LiveTrafficPage() {
             <span className="text-xs text-muted-foreground">min</span>
           </div>
           <p className="text-[11px] text-muted-foreground">Additional travel time over free flow</p>
+        </div>
+      </div>
+
+      {/* Live Metropolitan Traffic Map Canvas */}
+      <div className="p-6 rounded-3xl bg-card border border-border shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+              <Radio className="h-4 w-4 text-quantum-500 animate-pulse" />
+              Live Incident & Congestion Radar ({selectedCity})
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Interactive geospatial plotting of verified incidents, congestion zones, and flow velocities. Toggle between Dark, Light, or Voyager styles.
+            </p>
+          </div>
+          <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0 self-start sm:self-auto">
+            {filteredIncidents.length} Verified Incidents Plotted
+          </span>
+        </div>
+
+        <div className="h-[440px] w-full rounded-2xl overflow-hidden border border-border shadow-inner">
+          <MapWrapper
+            center={cityCoordinates[selectedCity] || cityCoordinates['Bengaluru']}
+            zoom={12}
+            incidents={filteredIncidents}
+            showIncidents={true}
+            showTrafficFlow={true}
+            tomtomTrafficTileUrl={trafficData?.flowTileUrl || ''}
+            defaultBasemap="cyber-dark"
+          />
         </div>
       </div>
 

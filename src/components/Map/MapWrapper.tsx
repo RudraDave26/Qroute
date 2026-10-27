@@ -21,6 +21,7 @@ interface MapWrapperProps {
   zoom?: number;
   origin?: LatLng | null;
   destination?: LatLng | null;
+  stops?: Array<{ id: string; lat: number; lng: number; label: string }>;
   routes?: RouteAlternative[];
   selectedRouteId?: string | null;
   onSelectRoute?: (routeId: string) => void;
@@ -30,6 +31,7 @@ interface MapWrapperProps {
   showChargingStations?: boolean;
   showTrafficFlow?: boolean;
   tomtomTrafficTileUrl?: string;
+  defaultBasemap?: 'cyber-dark' | 'clean-light' | 'voyager' | 'standard';
 }
 
 export function MapWrapper(props: MapWrapperProps) {

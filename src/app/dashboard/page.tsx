@@ -765,34 +765,34 @@ export default function DashboardPage() {
       <div className="flex-1 relative h-full flex flex-col">
         {/* Floating Top Stats Header Overlay */}
         {selectedRoute && (
-          <div className="absolute top-4 left-4 right-4 z-20 pointer-events-none flex flex-wrap items-center justify-between gap-2">
-            <div className="pointer-events-auto bg-card/95 backdrop-blur-md border border-border shadow-lg rounded-xl px-4 py-2 flex items-center gap-4 text-xs font-semibold">
+          <div className="absolute top-3 left-3 z-20 pointer-events-none flex flex-wrap items-center gap-2 max-w-[calc(100%-250px)]">
+            <div className="pointer-events-auto bg-card/95 backdrop-blur-md border border-border shadow-lg rounded-xl px-3.5 py-1.5 flex items-center gap-3.5 text-xs font-semibold">
               <div>
-                <span className="text-[10px] text-muted-foreground block">ESTIMATED ETA</span>
+                <span className="text-[9px] text-muted-foreground block uppercase font-bold tracking-wider">ETA</span>
                 <span className="text-sm font-extrabold text-foreground">{formatDuration(selectedRoute.durationMin)}</span>
               </div>
-              <div className="h-6 w-px bg-border" />
+              <div className="h-5 w-px bg-border" />
               <div>
-                <span className="text-[10px] text-muted-foreground block">DISTANCE</span>
+                <span className="text-[9px] text-muted-foreground block uppercase font-bold tracking-wider">Distance</span>
                 <span className="text-sm font-extrabold text-foreground">{formatDistance(selectedRoute.distanceKm)}</span>
               </div>
-              <div className="h-6 w-px bg-border" />
+              <div className="h-5 w-px bg-border" />
               <div>
-                <span className="text-[10px] text-muted-foreground block">ENERGY COST</span>
+                <span className="text-[9px] text-muted-foreground block uppercase font-bold tracking-wider">Est. Cost</span>
                 <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
                   {formatCurrency(selectedRoute.fuelCostInr)}
                 </span>
               </div>
-              <div className="h-6 w-px bg-border" />
-              <div>
-                <span className="text-[10px] text-muted-foreground block">CO₂ EMISSIONS</span>
+              <div className="h-5 w-px bg-border hidden sm:block" />
+              <div className="hidden sm:block">
+                <span className="text-[9px] text-muted-foreground block uppercase font-bold tracking-wider">CO₂</span>
                 <span className="text-sm font-extrabold text-foreground">
                   {formatEmissions(selectedRoute.emissionsKg)}
                 </span>
               </div>
             </div>
 
-            <div className="pointer-events-auto flex items-center gap-2 bg-card/95 backdrop-blur-md border border-border px-3 py-1.5 rounded-xl shadow-md text-xs">
+            <div className="pointer-events-auto flex items-center gap-1.5 bg-card/95 backdrop-blur-md border border-border px-2.5 py-1.5 rounded-xl shadow-md text-xs">
               <StatusBadge status={selectedRoute.dataStatus} />
               <button
                 type="button"
@@ -805,7 +805,8 @@ export default function DashboardPage() {
                 title="Toggle EV charging stations layer"
               >
                 <BatteryCharging className="h-3.5 w-3.5" />
-                <span>EV Hubs ({chargingStations.length})</span>
+                <span className="hidden md:inline">EV Hubs ({chargingStations.length})</span>
+                <span className="md:hidden">EV</span>
               </button>
               <button
                 type="button"
@@ -818,7 +819,8 @@ export default function DashboardPage() {
                 title="Toggle Live Congestion Flow Overlay"
               >
                 <Wind className="h-3.5 w-3.5" />
-                <span>Traffic Flow Heatmap</span>
+                <span className="hidden md:inline">Flow Heatmap</span>
+                <span className="md:hidden">Flow</span>
               </button>
             </div>
           </div>
@@ -831,6 +833,7 @@ export default function DashboardPage() {
             zoom={12}
             origin={origin}
             destination={destination}
+            stops={stops.filter((s) => s.lat && s.lng).map((s) => ({ id: s.id, lat: s.lat, lng: s.lng, label: s.label || s.query }))}
             routes={routes}
             selectedRouteId={selectedRouteId}
             onSelectRoute={(id) => setSelectedRouteId(id)}
