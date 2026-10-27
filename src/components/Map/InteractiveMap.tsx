@@ -12,13 +12,7 @@ import {
   Plus,
   Minus,
   Crosshair,
-  Compass,
-  Navigation2,
-  Layers,
-  MapPin,
 } from 'lucide-react';
-
-export type MapStyle = 'cyber-dark' | 'clean-light' | 'voyager' | 'standard';
 
 interface MapStop {
   id: string;
@@ -42,47 +36,7 @@ interface InteractiveMapProps {
   showChargingStations?: boolean;
   showTrafficFlow?: boolean;
   tomtomTrafficTileUrl?: string;
-  defaultBasemap?: MapStyle;
 }
-
-interface TileConfig {
-  name: string;
-  url: string;
-  subdomains: string;
-  dark: boolean;
-  maxZoom: number;
-}
-
-const BASEMAP_TILES: Record<MapStyle, TileConfig> = {
-  'cyber-dark': {
-    name: 'Cyber Dark',
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    subdomains: 'abcd',
-    dark: true,
-    maxZoom: 19,
-  },
-  'clean-light': {
-    name: 'Clean Light',
-    url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    subdomains: 'abcd',
-    dark: false,
-    maxZoom: 19,
-  },
-  'voyager': {
-    name: 'Voyager Detail',
-    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    subdomains: 'abcd',
-    dark: false,
-    maxZoom: 19,
-  },
-  'standard': {
-    name: 'Standard OSM',
-    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    subdomains: 'abc',
-    dark: false,
-    maxZoom: 19,
-  },
-};
 
 // Smooth bounds fitter when endpoints, waypoints, or route selection changes
 function MapBoundsController({
@@ -125,23 +79,19 @@ function MapBoundsController({
   return null;
 }
 
-// Custom Glassmorphic Controls inside the Leaflet map container
+// Floating Zoom and Recenter Controls inside the Leaflet map container
 function MapFloatingControls({
   origin,
   destination,
   stops,
   routes,
   selectedRouteId,
-  currentStyle,
-  onStyleChange,
 }: {
   origin?: LatLng | null;
   destination?: LatLng | null;
   stops?: MapStop[];
   routes?: RouteAlternative[];
   selectedRouteId?: string | null;
-  currentStyle: MapStyle;
-  onStyleChange: (s: MapStyle) => void;
 }) {
   const map = useMap();
 
@@ -162,101 +112,38 @@ function MapFloatingControls({
   };
 
   return (
-    <>
-      {/* Top-Right Style Switcher */}
-      <div className="leaflet-top leaflet-right pointer-events-auto mt-3 mr-3 z-[1000]">
-        <div className="bg-card/95 backdrop-blur-md border border-border/80 shadow-lg rounded-xl p-1 flex items-center gap-1 text-xs">
-          <button
-            type="button"
-            onClick={() => onStyleChange('cyber-dark')}
-            className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all flex items-center gap-1 ${
-              currentStyle === 'cyber-dark'
-                ? 'bg-cyan-600 text-white shadow-xs'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/70'
-            }`}
-            title="Cyber Dark Matrix (Neon Routes)"
-          >
-            <span>🌙</span>
-            <span className="hidden sm:inline">Dark</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onStyleChange('clean-light')}
-            className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all flex items-center gap-1 ${
-              currentStyle === 'clean-light'
-                ? 'bg-cyan-600 text-white shadow-xs'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/70'
-            }`}
-            title="Clean Light Vector Map"
-          >
-            <span>☀️</span>
-            <span className="hidden sm:inline">Light</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onStyleChange('voyager')}
-            className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all flex items-center gap-1 ${
-              currentStyle === 'voyager'
-                ? 'bg-cyan-600 text-white shadow-xs'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/70'
-            }`}
-            title="Voyager High-Detail Street & Greenery"
-          >
-            <span>🗺️</span>
-            <span className="hidden sm:inline">Voyager</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => onStyleChange('standard')}
-            className={`px-2 py-1 rounded-lg font-medium text-[11px] transition-all ${
-              currentStyle === 'standard'
-                ? 'bg-cyan-600 text-white shadow-xs'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted/70'
-            }`}
-            title="OpenStreetMap Standard"
-          >
-            <span>OSM</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Bottom-Right Sleek Zoom & Recenter Cluster */}
-      <div className="leaflet-bottom leaflet-right pointer-events-auto mb-4 mr-3 z-[1000] flex flex-col gap-2">
-        <div className="bg-card/95 backdrop-blur-md border border-border/80 shadow-lg rounded-xl overflow-hidden flex flex-col">
-          <button
-            type="button"
-            onClick={() => map.zoomIn()}
-            className="p-2.5 hover:bg-muted text-foreground transition-colors border-b border-border/60 flex items-center justify-center hover:text-quantum-600"
-            title="Zoom In"
-            aria-label="Zoom in"
-          >
-            <Plus className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => map.zoomOut()}
-            className="p-2.5 hover:bg-muted text-foreground transition-colors flex items-center justify-center hover:text-quantum-600"
-            title="Zoom Out"
-            aria-label="Zoom out"
-          >
-            <Minus className="h-4 w-4" />
-          </button>
-        </div>
-
+    <div className="leaflet-bottom leaflet-right pointer-events-auto mb-4 mr-3 z-[1000] flex flex-col gap-2">
+      <div className="bg-card/95 backdrop-blur-md border border-border/80 shadow-lg rounded-xl overflow-hidden flex flex-col">
         <button
           type="button"
-          onClick={handleRecenter}
-          className="p-2.5 bg-card/95 backdrop-blur-md hover:bg-card border border-border/80 text-foreground shadow-lg rounded-xl transition-all flex items-center justify-center hover:scale-105 active:scale-95 group"
-          title="Recenter & Fit Active Route"
-          aria-label="Recenter route"
+          onClick={() => map.zoomIn()}
+          className="p-2.5 hover:bg-muted text-foreground transition-colors border-b border-border/60 flex items-center justify-center hover:text-quantum-600"
+          title="Zoom In"
+          aria-label="Zoom in"
         >
-          <Crosshair className="h-4 w-4 text-quantum-600 dark:text-quantum-400 group-hover:rotate-45 transition-transform" />
+          <Plus className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => map.zoomOut()}
+          className="p-2.5 hover:bg-muted text-foreground transition-colors flex items-center justify-center hover:text-quantum-600"
+          title="Zoom Out"
+          aria-label="Zoom out"
+        >
+          <Minus className="h-4 w-4" />
         </button>
       </div>
-    </>
+
+      <button
+        type="button"
+        onClick={handleRecenter}
+        className="p-2.5 bg-card/95 backdrop-blur-md hover:bg-card border border-border/80 text-foreground shadow-lg rounded-xl transition-all flex items-center justify-center hover:scale-105 active:scale-95 group"
+        title="Recenter & Fit Active Route"
+        aria-label="Recenter route"
+      >
+        <Crosshair className="h-4 w-4 text-quantum-600 dark:text-quantum-400 group-hover:rotate-45 transition-transform" />
+      </button>
+    </div>
   );
 }
 
@@ -275,10 +162,8 @@ export default function InteractiveMap({
   showChargingStations = true,
   showTrafficFlow = false,
   tomtomTrafficTileUrl = '',
-  defaultBasemap = 'cyber-dark',
 }: InteractiveMapProps) {
   const [mounted, setMounted] = useState(false);
-  const [mapStyle, setMapStyle] = useState<MapStyle>(defaultBasemap);
 
   useEffect(() => {
     setMounted(true);
@@ -372,13 +257,11 @@ export default function InteractiveMap({
       <div className="w-full h-full min-h-[450px] flex items-center justify-center bg-slate-100 dark:bg-navy-950 rounded-2xl border border-border">
         <div className="flex flex-col items-center gap-3">
           <div className="h-8 w-8 rounded-full border-2 border-quantum-500 border-t-transparent animate-spin" />
-          <span className="text-sm font-medium text-muted-foreground">Initializing Dynamic Geospatial Canvas...</span>
+          <span className="text-sm font-medium text-muted-foreground">Initializing Geospatial Canvas...</span>
         </div>
       </div>
     );
   }
-
-  const activeBasemap = BASEMAP_TILES[mapStyle] || BASEMAP_TILES['cyber-dark'];
 
   return (
     <div className="relative w-full h-full min-h-[450px] rounded-2xl overflow-hidden shadow-inner border border-border group">
@@ -389,13 +272,12 @@ export default function InteractiveMap({
         scrollWheelZoom={true}
         className="w-full h-full"
       >
-        {/* Dynamic Basemap Tile Layer */}
+        {/* Clean Modern Vector Basemap Tile Layer */}
         <TileLayer
-          key={mapStyle}
           attribution="&copy; QuantumRoute AI Geospatial Network"
-          url={activeBasemap.url}
-          subdomains={activeBasemap.subdomains}
-          maxZoom={activeBasemap.maxZoom}
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          subdomains="abcd"
+          maxZoom={19}
         />
 
         {/* Optional Traffic Flow Raster Layer */}
@@ -417,15 +299,13 @@ export default function InteractiveMap({
           selectedRouteId={selectedRouteId}
         />
 
-        {/* Floating Controls inside Leaflet Container */}
+        {/* Floating Zoom & Recenter Controls */}
         <MapFloatingControls
           origin={origin}
           destination={destination}
           stops={stops}
           routes={routes}
           selectedRouteId={selectedRouteId}
-          currentStyle={mapStyle}
-          onStyleChange={(s) => setMapStyle(s)}
         />
 
         {/* Origin Marker (Point A) */}

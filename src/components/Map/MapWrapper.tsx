@@ -31,7 +31,6 @@ interface MapWrapperProps {
   showChargingStations?: boolean;
   showTrafficFlow?: boolean;
   tomtomTrafficTileUrl?: string;
-  defaultBasemap?: 'cyber-dark' | 'clean-light' | 'voyager' | 'standard';
 }
 
 export function MapWrapper(props: MapWrapperProps) {

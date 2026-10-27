@@ -208,7 +208,7 @@ export default function LiveTrafficPage() {
               Live Incident & Congestion Radar ({selectedCity})
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Interactive geospatial plotting of verified incidents, congestion zones, and flow velocities. Toggle between Dark, Light, or Voyager styles.
+              Interactive geospatial plotting of verified incidents, congestion zones, and flow velocities across metropolitan corridors.
             </p>
           </div>
           <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shrink-0 self-start sm:self-auto">
@@ -224,7 +224,6 @@ export default function LiveTrafficPage() {
             showIncidents={true}
             showTrafficFlow={true}
             tomtomTrafficTileUrl={trafficData?.flowTileUrl || ''}
-            defaultBasemap="cyber-dark"
           />
         </div>
       </div>
