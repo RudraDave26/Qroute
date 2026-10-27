@@ -113,11 +113,11 @@ function MapFloatingControls({
 
   return (
     <div className="leaflet-bottom leaflet-right pointer-events-auto mb-4 mr-3 z-[1000] flex flex-col gap-2">
-      <div className="bg-white/95 dark:bg-[#0B1220]/95 backdrop-blur-md border border-[#E5E9F2] dark:border-slate-800 shadow-md rounded-xl overflow-hidden flex flex-col">
+      <div className="bg-card/95 backdrop-blur-md border border-border shadow-md rounded-xl overflow-hidden flex flex-col">
         <button
           type="button"
           onClick={() => map.zoomIn()}
-          className="p-2.5 hover:bg-[#F4F6FA] dark:hover:bg-slate-800/80 text-[#0B1220] dark:text-white transition-colors border-b border-[#E5E9F2] dark:border-slate-800 flex items-center justify-center hover:text-[#14B8A6]"
+          className="p-2.5 hover:bg-muted text-foreground transition-colors border-b border-border flex items-center justify-center hover:text-quantum-600"
           title="Zoom In"
           aria-label="Zoom in"
         >
@@ -126,7 +126,7 @@ function MapFloatingControls({
         <button
           type="button"
           onClick={() => map.zoomOut()}
-          className="p-2.5 hover:bg-[#F4F6FA] dark:hover:bg-slate-800/80 text-[#0B1220] dark:text-white transition-colors flex items-center justify-center hover:text-[#14B8A6]"
+          className="p-2.5 hover:bg-muted text-foreground transition-colors flex items-center justify-center hover:text-quantum-600"
           title="Zoom Out"
           aria-label="Zoom out"
         >
@@ -137,11 +137,11 @@ function MapFloatingControls({
       <button
         type="button"
         onClick={handleRecenter}
-        className="p-2.5 bg-white/95 dark:bg-[#0B1220]/95 backdrop-blur-md hover:bg-white dark:hover:bg-[#0B1220] border border-[#E5E9F2] dark:border-slate-800 text-[#0B1220] dark:text-white shadow-md rounded-xl transition-all flex items-center justify-center hover:scale-105 active:scale-95 group"
+        className="p-2.5 bg-card/95 backdrop-blur-md hover:bg-card border border-border text-foreground shadow-md rounded-xl transition-all flex items-center justify-center hover:scale-105 active:scale-95 group"
         title="Recenter Route"
         aria-label="Recenter route"
       >
-        <Crosshair className="h-4 w-4 text-[#14B8A6] transition-transform duration-300 group-hover:rotate-45" />
+        <Crosshair className="h-4 w-4 text-quantum-600 dark:text-quantum-400 transition-transform duration-300 group-hover:rotate-45" />
       </button>
     </div>
   );
@@ -176,7 +176,7 @@ export default function InteractiveMap({
       className: 'custom-div-icon',
       html: `
         <div style="position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
-          <div style="width: 26px; height: 26px; border-radius: 50%; background: #14B8A6; border: 2.5px solid #FFFFFF; box-shadow: 0 3px 8px rgba(20, 184, 166, 0.4); display: flex; align-items: center; justify-content: center;">
+          <div style="width: 26px; height: 26px; border-radius: 50%; background: #10b981; border: 2.5px solid #FFFFFF; box-shadow: 0 3px 8px rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center;">
             <span style="color: #FFFFFF; font-size: 11px; font-weight: 800; font-family: ui-sans-serif, system-ui;">A</span>
           </div>
         </div>
@@ -192,7 +192,7 @@ export default function InteractiveMap({
       className: 'custom-div-icon',
       html: `
         <div style="position: relative; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
-          <div style="width: 26px; height: 26px; border-radius: 50%; background: #EF4444; border: 2.5px solid #FFFFFF; box-shadow: 0 3px 8px rgba(239, 68, 68, 0.4); display: flex; align-items: center; justify-content: center;">
+          <div style="width: 26px; height: 26px; border-radius: 50%; background: #ef4444; border: 2.5px solid #FFFFFF; box-shadow: 0 3px 8px rgba(239, 68, 68, 0.4); display: flex; align-items: center; justify-content: center;">
             <span style="color: #FFFFFF; font-size: 11px; font-weight: 800; font-family: ui-sans-serif, system-ui;">B</span>
           </div>
         </div>
@@ -207,7 +207,7 @@ export default function InteractiveMap({
       className: 'custom-div-icon',
       html: `
         <div style="position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
-          <div style="width: 22px; height: 22px; border-radius: 50%; background: #F59E0B; border: 2px solid #FFFFFF; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center;">
+          <div style="width: 22px; height: 22px; border-radius: 50%; background: #f59e0b; border: 2px solid #FFFFFF; box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center;">
             <span style="color: #FFFFFF; font-size: 10px; font-weight: 800; font-family: ui-sans-serif, system-ui;">${idx + 1}</span>
           </div>
         </div>
@@ -218,7 +218,7 @@ export default function InteractiveMap({
   };
 
   const incidentIcon = (severity: TrafficIncident['severity']) => {
-    const bgColor = severity === 'critical' ? '#EF4444' : severity === 'major' ? '#F59E0B' : '#F59E0B';
+    const bgColor = severity === 'critical' ? '#ef4444' : severity === 'major' ? '#f59e0b' : '#f59e0b';
     return L.divIcon({
       className: 'custom-div-icon',
       html: `
@@ -236,7 +236,7 @@ export default function InteractiveMap({
     return L.divIcon({
       className: 'custom-div-icon',
       html: `
-        <div style="width: 22px; height: 22px; border-radius: 50%; background: #14B8A6; border: 2px solid #FFFFFF; box-shadow: 0 2px 6px rgba(20, 184, 166, 0.35); display: flex; align-items: center; justify-content: center;">
+        <div style="width: 22px; height: 22px; border-radius: 50%; background: #06b6d4; border: 2px solid #FFFFFF; box-shadow: 0 2px 6px rgba(6, 182, 212, 0.35); display: flex; align-items: center; justify-content: center;">
           <span style="color: #FFFFFF; font-size: 10px; font-weight: bold; line-height: 1;">⚡</span>
         </div>
       `,
@@ -247,9 +247,9 @@ export default function InteractiveMap({
 
   if (!mounted) {
     return (
-      <div className="w-full h-full min-h-[450px] flex items-center justify-center bg-[#F4F6FA] dark:bg-[#0B1220] rounded-2xl border border-[#E5E9F2] dark:border-slate-800">
+      <div className="w-full h-full min-h-[450px] flex items-center justify-center bg-muted/40 rounded-2xl border border-border">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-7 w-7 rounded-full border-2 border-[#14B8A6] border-t-transparent animate-spin" />
+          <div className="h-7 w-7 rounded-full border-2 border-quantum-500 border-t-transparent animate-spin" />
           <span className="text-xs font-medium text-muted-foreground">Loading Map View...</span>
         </div>
       </div>
@@ -257,7 +257,7 @@ export default function InteractiveMap({
   }
 
   return (
-    <div className="relative w-full h-full min-h-[450px] rounded-2xl overflow-hidden shadow-inner border border-[#E5E9F2] dark:border-slate-800 group">
+    <div className="relative w-full h-full min-h-[450px] rounded-2xl overflow-hidden shadow-inner border border-border group">
       <MapContainer
         center={[center.lat, center.lng]}
         zoom={zoom}
@@ -305,10 +305,10 @@ export default function InteractiveMap({
           <Marker position={[origin.lat, origin.lng]} icon={originIcon}>
             <Popup>
               <div className="p-1 space-y-1">
-                <span className="text-[10px] font-bold text-[#14B8A6] uppercase tracking-wider block">
+                <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider block">
                   Departure Point (A)
                 </span>
-                <p className="text-xs font-bold text-[#0B1220] dark:text-white">{origin.label || 'Origin'}</p>
+                <p className="text-xs font-bold text-foreground">{origin.label || 'Origin'}</p>
                 <p className="text-[11px] text-muted-foreground font-mono">
                   {origin.lat.toFixed(4)}, {origin.lng.toFixed(4)}
                 </p>
@@ -323,10 +323,10 @@ export default function InteractiveMap({
             <Marker key={stop.id || sIdx} position={[stop.lat, stop.lng]} icon={createStopIcon(sIdx)}>
               <Popup>
                 <div className="p-1 space-y-1">
-                  <span className="text-[10px] font-bold text-[#F59E0B] uppercase tracking-wider block">
+                  <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider block">
                     Stop #{sIdx + 1}
                   </span>
-                  <p className="text-xs font-bold text-[#0B1220] dark:text-white">{stop.label}</p>
+                  <p className="text-xs font-bold text-foreground">{stop.label}</p>
                   <p className="text-[11px] text-muted-foreground font-mono">
                     {stop.lat.toFixed(4)}, {stop.lng.toFixed(4)}
                   </p>
@@ -340,10 +340,10 @@ export default function InteractiveMap({
           <Marker position={[destination.lat, destination.lng]} icon={destinationIcon}>
             <Popup>
               <div className="p-1 space-y-1">
-                <span className="text-[10px] font-bold text-[#EF4444] uppercase tracking-wider block">
+                <span className="text-[10px] font-bold text-rose-600 uppercase tracking-wider block">
                   Destination (B)
                 </span>
-                <p className="text-xs font-bold text-[#0B1220] dark:text-white">{destination.label || 'Destination'}</p>
+                <p className="text-xs font-bold text-foreground">{destination.label || 'Destination'}</p>
                 <p className="text-[11px] text-muted-foreground font-mono">
                   {destination.lat.toFixed(4)}, {destination.lng.toFixed(4)}
                 </p>
@@ -363,14 +363,14 @@ export default function InteractiveMap({
               <Popup>
                 <div className="p-2 max-w-xs space-y-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-red-50 dark:bg-red-950/40 text-[#EF4444]">
+                    <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">
                       {inc.type}
                     </span>
-                    <span className="text-[10px] font-bold text-[#EF4444]">
+                    <span className="text-[10px] font-bold text-rose-600">
                       +{Math.round(inc.delaySeconds / 60)} min delay
                     </span>
                   </div>
-                  <p className="text-xs font-bold text-[#0B1220] dark:text-white">{inc.roadName}</p>
+                  <p className="text-xs font-bold text-foreground">{inc.roadName}</p>
                   <p className="text-[11px] text-muted-foreground leading-snug">{inc.description}</p>
                 </div>
               </Popup>
@@ -385,12 +385,12 @@ export default function InteractiveMap({
               <Popup>
                 <div className="p-2 max-w-xs space-y-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-teal-50 dark:bg-teal-950/40 text-[#14B8A6]">
+                    <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300">
                       ⚡ {st.powerKw} kW DC
                     </span>
                     <span className="text-[10px] text-muted-foreground">{st.connectionType}</span>
                   </div>
-                  <p className="text-xs font-bold text-[#0B1220] dark:text-white">{st.title}</p>
+                  <p className="text-xs font-bold text-foreground">{st.title}</p>
                   <p className="text-[11px] text-muted-foreground">{st.address}</p>
                 </div>
               </Popup>
@@ -405,7 +405,7 @@ export default function InteractiveMap({
               key={route.id}
               positions={route.coordinates}
               pathOptions={{
-                color: '#94A3B8',
+                color: '#94a3b8',
                 weight: 3.5,
                 opacity: 0.65,
                 dashArray: '4, 8',
@@ -417,11 +417,11 @@ export default function InteractiveMap({
               <Popup>
                 <div className="p-2 space-y-1">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs font-bold text-[#0B1220] dark:text-white">{route.name}</p>
+                    <p className="text-xs font-bold text-foreground">{route.name}</p>
                     <button
                       type="button"
                       onClick={() => onSelectRoute?.(route.id)}
-                      className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-950/40 text-[#14B8A6] hover:bg-teal-100"
+                      className="text-[10px] font-bold px-2 py-0.5 rounded bg-quantum-500/15 text-quantum-700 dark:text-quantum-300 hover:bg-quantum-500/25"
                     >
                       Select
                     </button>
@@ -431,34 +431,34 @@ export default function InteractiveMap({
                     <span>•</span>
                     <span>{formatDuration(route.durationMin)}</span>
                     <span>•</span>
-                    <span className="text-[#0B1220] dark:text-white font-bold">{formatCurrency(route.fuelCostInr)}</span>
+                    <span className="text-foreground font-bold">{formatCurrency(route.fuelCostInr)}</span>
                   </div>
                 </div>
               </Popup>
             </Polyline>
           ))}
 
-        {/* Selected Route (Elegant Teal Casing & Core) */}
+        {/* Selected Route (Electric Cyan Glow Casing & Core) */}
         {routes
           .filter((r) => r.id === selectedRouteId)
           .map((route) => (
             <React.Fragment key={route.id}>
-              {/* Subtle Teal Halo Casing */}
+              {/* Outer Cyan Halo Casing */}
               <Polyline
                 positions={route.coordinates}
                 pathOptions={{
-                  color: '#14B8A6',
+                  color: '#06b6d4',
                   weight: 10,
-                  opacity: 0.25,
+                  opacity: 0.35,
                   lineCap: 'round',
                   lineJoin: 'round',
                 }}
               />
-              {/* Sharp Teal Vector Core */}
+              {/* Sharp Electric Cyan Core */}
               <Polyline
                 positions={route.coordinates}
                 pathOptions={{
-                  color: '#14B8A6',
+                  color: '#0891b2',
                   weight: 5,
                   opacity: 0.95,
                   lineCap: 'round',
@@ -467,16 +467,16 @@ export default function InteractiveMap({
               >
                 <Popup>
                   <div className="p-2 space-y-1">
-                    <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-teal-50 dark:bg-teal-950/40 text-[#14B8A6]">
+                    <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300">
                       Selected Route
                     </span>
-                    <p className="text-xs font-bold text-[#0B1220] dark:text-white">{route.name}</p>
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#0B1220] dark:text-white pt-1">
+                    <p className="text-xs font-bold text-foreground">{route.name}</p>
+                    <div className="flex items-center gap-2 text-xs font-bold text-foreground pt-1">
                       <span>{formatDistance(route.distanceKm)}</span>
                       <span>•</span>
                       <span>{formatDuration(route.durationMin)}</span>
                       <span>•</span>
-                      <span className="text-[#14B8A6]">{formatCurrency(route.fuelCostInr)}</span>
+                      <span className="text-quantum-600 dark:text-quantum-400">{formatCurrency(route.fuelCostInr)}</span>
                     </div>
                   </div>
                 </Popup>

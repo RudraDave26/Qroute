@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { MapWrapper } from '@/components/Map/MapWrapper';
 import { RouteCard } from '@/components/RouteCard';
-import { StatusBadge } from '@/components/StatusBadge';
 import {
   LatLng,
   RouteAlternative,
@@ -16,29 +15,18 @@ import {
 } from '@/lib/types';
 import { saveRoute } from '@/lib/storage';
 import {
-  Search,
   ArrowUpDown,
   Navigation,
   Compass,
-  Sliders,
   ChevronDown,
   ChevronUp,
-  AlertTriangle,
   BookmarkPlus,
   RefreshCw,
   Check,
-  Zap,
   Wind,
   BatteryCharging,
-  Fuel,
-  Plus,
   X,
   Sparkles,
-  MapPin,
-  Car,
-  ChevronRight,
-  TrendingDown,
-  Info,
 } from 'lucide-react';
 import { formatCurrency, formatDistance, formatDuration, formatEmissions } from '@/lib/utils';
 
@@ -336,7 +324,7 @@ export default function DashboardPage() {
   const renderRouteInputs = () => (
     <div className="space-y-3">
       {/* Vehicle Type Selector Pills */}
-      <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#F4F6FA] dark:bg-[#101A30] border border-[#E5E9F2] dark:border-slate-800">
+      <div className="flex items-center gap-1.5 p-1 rounded-xl bg-muted border border-border">
         {[
           { id: 'petrol', label: 'Petrol' },
           { id: 'diesel', label: 'Diesel' },
@@ -349,8 +337,8 @@ export default function DashboardPage() {
             onClick={() => setVehicleType(v.id as VehicleType)}
             className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all text-center ${
               vehicleType === v.id
-                ? 'bg-[#14B8A6] text-white shadow-xs'
-                : 'text-[#0B1220]/70 dark:text-white/70 hover:text-[#0B1220] dark:hover:text-white'
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {v.label}
@@ -362,26 +350,26 @@ export default function DashboardPage() {
       <div className="space-y-2 relative">
         {/* Origin Input */}
         <div className="relative">
-          <div className="absolute left-3 top-3 h-2.5 w-2.5 rounded-full bg-[#14B8A6]" />
+          <div className="absolute left-3 top-3 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20" />
           <input
             type="text"
             value={originQuery}
             onChange={(e) => handleOriginSearch(e.target.value)}
             placeholder="Starting location..."
-            className="w-full pl-9 pr-9 py-2.5 rounded-xl text-xs sm:text-sm bg-[#F4F6FA] dark:bg-[#101A30] border border-[#E5E9F2] dark:border-slate-800 text-[#0B1220] dark:text-white focus:outline-hidden focus:ring-2 focus:ring-[#14B8A6]/40"
+            className="w-full pl-9 pr-9 py-2.5 rounded-xl text-xs sm:text-sm bg-background border border-border text-foreground focus:outline-hidden focus:ring-2 focus:ring-quantum-500/40"
           />
           <button
             type="button"
             onClick={handleGeolocation}
             title="Use Current GPS"
-            className="absolute right-2.5 top-2.5 p-1 text-muted-foreground hover:text-[#14B8A6] transition-colors"
+            className="absolute right-2.5 top-2.5 p-1 text-muted-foreground hover:text-quantum-600 transition-colors"
           >
             <Compass className="h-4 w-4" />
           </button>
 
           {/* Autocomplete */}
           {originSuggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-[#0B1220] border border-[#E5E9F2] dark:border-slate-800 rounded-xl shadow-lg z-50 max-h-52 overflow-y-auto">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-50 max-h-52 overflow-y-auto">
               {originSuggestions.map((item) => (
                 <button
                   key={item.id}
@@ -391,9 +379,9 @@ export default function DashboardPage() {
                     setOriginQuery(item.name);
                     setOriginSuggestions([]);
                   }}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-[#F4F6FA] dark:hover:bg-slate-800/60 border-b border-[#E5E9F2]/50 last:border-0"
+                  className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/50 last:border-0"
                 >
-                  <p className="font-semibold text-[#0B1220] dark:text-white truncate">{item.name}</p>
+                  <p className="font-semibold text-foreground truncate">{item.name}</p>
                   <p className="text-[10px] text-muted-foreground line-clamp-1">{item.displayName}</p>
                 </button>
               ))}
@@ -407,7 +395,7 @@ export default function DashboardPage() {
             type="button"
             onClick={addIntermediateStop}
             disabled={stops.length >= 3}
-            className="text-[11px] font-semibold text-[#14B8A6] hover:underline disabled:opacity-40"
+            className="text-[11px] font-semibold text-quantum-600 dark:text-quantum-400 hover:underline disabled:opacity-40"
           >
             + Add Stop {stops.length > 0 ? `(${stops.length}/3)` : ''}
           </button>
@@ -416,7 +404,7 @@ export default function DashboardPage() {
             type="button"
             onClick={swapEndpoints}
             title="Swap Origin and Destination"
-            className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#F4F6FA] dark:bg-slate-800 text-muted-foreground hover:text-[#0B1220] dark:hover:text-white transition-colors"
+            className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowUpDown className="h-3 w-3" />
             <span>Swap</span>
@@ -426,31 +414,31 @@ export default function DashboardPage() {
         {/* Waypoints List */}
         {stops.map((stop, sIdx) => (
           <div key={stop.id} className="relative">
-            <div className="absolute left-3 top-3 h-2.5 w-2.5 rounded-full bg-[#F59E0B]" />
+            <div className="absolute left-3 top-3 h-2.5 w-2.5 rounded-full bg-amber-500 ring-2 ring-amber-500/20" />
             <input
               type="text"
               value={stop.query}
               onChange={(e) => handleStopSearch(sIdx, e.target.value)}
               placeholder={`Stop ${sIdx + 1}...`}
-              className="w-full pl-9 pr-9 py-2 rounded-xl text-xs bg-[#F4F6FA] dark:bg-[#101A30] border border-[#E5E9F2] dark:border-slate-800 text-[#0B1220] dark:text-white focus:outline-hidden focus:ring-1 focus:ring-[#F59E0B]"
+              className="w-full pl-9 pr-9 py-2 rounded-xl text-xs bg-background border border-border text-foreground focus:outline-hidden focus:ring-1 focus:ring-amber-500"
             />
             <button
               type="button"
               onClick={() => removeIntermediateStop(sIdx)}
-              className="absolute right-2.5 top-2.5 p-1 text-muted-foreground hover:text-[#EF4444] transition-colors"
+              className="absolute right-2.5 top-2.5 p-1 text-muted-foreground hover:text-rose-500 transition-colors"
             >
               <X className="h-3.5 w-3.5" />
             </button>
             {stop.suggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-[#0B1220] border border-[#E5E9F2] dark:border-slate-800 rounded-xl shadow-lg z-50 max-h-44 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-50 max-h-44 overflow-y-auto">
                 {stop.suggestions.map((item) => (
                   <button
                     key={item.id}
                     type="button"
                     onClick={() => selectStopLocation(sIdx, item)}
-                    className="w-full text-left px-3 py-2 text-xs hover:bg-[#F4F6FA] dark:hover:bg-slate-800 border-b border-[#E5E9F2]/50 last:border-0"
+                    className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/50 last:border-0"
                   >
-                    <p className="font-semibold text-[#0B1220] dark:text-white truncate">{item.name}</p>
+                    <p className="font-semibold text-foreground truncate">{item.name}</p>
                     <p className="text-[10px] text-muted-foreground line-clamp-1">{item.displayName}</p>
                   </button>
                 ))}
@@ -461,18 +449,18 @@ export default function DashboardPage() {
 
         {/* Destination Input */}
         <div className="relative">
-          <div className="absolute left-3 top-3 h-2.5 w-2.5 rounded-full bg-[#EF4444]" />
+          <div className="absolute left-3 top-3 h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-rose-500/20" />
           <input
             type="text"
             value={destQuery}
             onChange={(e) => handleDestSearch(e.target.value)}
             placeholder="Destination location..."
-            className="w-full pl-9 pr-9 py-2.5 rounded-xl text-xs sm:text-sm bg-[#F4F6FA] dark:bg-[#101A30] border border-[#E5E9F2] dark:border-slate-800 text-[#0B1220] dark:text-white focus:outline-hidden focus:ring-2 focus:ring-[#14B8A6]/40"
+            className="w-full pl-9 pr-9 py-2.5 rounded-xl text-xs sm:text-sm bg-background border border-border text-foreground focus:outline-hidden focus:ring-2 focus:ring-quantum-500/40"
           />
 
           {/* Autocomplete */}
           {destSuggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-[#0B1220] border border-[#E5E9F2] dark:border-slate-800 rounded-xl shadow-lg z-50 max-h-52 overflow-y-auto">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-50 max-h-52 overflow-y-auto">
               {destSuggestions.map((item) => (
                 <button
                   key={item.id}
@@ -482,9 +470,9 @@ export default function DashboardPage() {
                     setDestQuery(item.name);
                     setDestSuggestions([]);
                   }}
-                  className="w-full text-left px-3 py-2 text-xs hover:bg-[#F4F6FA] dark:hover:bg-slate-800/60 border-b border-[#E5E9F2]/50 last:border-0"
+                  className="w-full text-left px-3 py-2 text-xs hover:bg-muted border-b border-border/50 last:border-0"
                 >
-                  <p className="font-semibold text-[#0B1220] dark:text-white truncate">{item.name}</p>
+                  <p className="font-semibold text-foreground truncate">{item.name}</p>
                   <p className="text-[10px] text-muted-foreground line-clamp-1">{item.displayName}</p>
                 </button>
               ))}
@@ -493,12 +481,12 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Primary CTA Button in Highlight Teal */}
+      {/* Primary CTA Button */}
       <button
         type="button"
         onClick={fetchRouteData}
         disabled={isLoadingRoutes}
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm bg-[#14B8A6] hover:bg-[#0D9488] text-white shadow-sm transition-all disabled:opacity-50"
+        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-all disabled:opacity-50"
       >
         {isLoadingRoutes ? (
           <>
@@ -507,7 +495,7 @@ export default function DashboardPage() {
           </>
         ) : (
           <>
-            <Sparkles className="h-4 w-4" />
+            <Sparkles className="h-4 w-4 text-quantum-300" />
             <span>Find Best Route</span>
           </>
         )}
@@ -516,14 +504,14 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="relative flex flex-col md:flex-row h-[calc(100vh-4rem)] overflow-hidden bg-[#F4F6FA] dark:bg-[#0B1220]">
+    <div className="relative flex flex-col md:flex-row h-[calc(100vh-4rem)] overflow-hidden bg-background">
       {/* DESKTOP SIDE PANEL (Compact, Uncluttered, Maximize Map) */}
-      <div className="hidden md:flex w-[380px] lg:w-[420px] flex-col h-full bg-white dark:bg-[#0B1220] border-r border-[#E5E9F2] dark:border-slate-800 shrink-0 z-20 overflow-hidden shadow-sm">
+      <div className="hidden md:flex w-[380px] lg:w-[420px] flex-col h-full bg-card border-r border-border shrink-0 z-20 overflow-hidden shadow-sm">
         {/* Top Input Section */}
-        <div className="p-4 border-b border-[#E5E9F2] dark:border-slate-800">
+        <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold text-[#0B1220] dark:text-white flex items-center gap-1.5">
-              <Navigation className="h-4 w-4 text-[#14B8A6]" />
+            <h2 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+              <Navigation className="h-4 w-4 text-quantum-600 dark:text-quantum-400" />
               Route Navigation
             </h2>
             <span className="text-[10px] font-semibold text-muted-foreground">QIGA Engine</span>
@@ -540,11 +528,11 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={handleSaveRoute}
-                className="inline-flex items-center gap-1 text-[#14B8A6] hover:underline"
+                className="inline-flex items-center gap-1 text-quantum-600 dark:text-quantum-400 hover:underline"
               >
                 {isSavedSuccessfully ? (
                   <>
-                    <Check className="h-3.5 w-3.5 text-[#10B981]" /> Saved!
+                    <Check className="h-3.5 w-3.5 text-emerald-500" /> Saved!
                   </>
                 ) : (
                   <>
@@ -561,7 +549,7 @@ export default function DashboardPage() {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="p-4 rounded-2xl border border-[#E5E9F2] dark:border-slate-800 bg-white dark:bg-[#101A30] space-y-2.5"
+                  className="p-4 rounded-2xl border border-border bg-card space-y-2.5"
                 >
                   <div className="flex justify-between items-center">
                     <div className="h-4 w-28 rounded-md skeleton-shimmer" />
@@ -595,18 +583,18 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setShowAnalyticsDrawer(!showAnalyticsDrawer)}
-                className="w-full py-2.5 px-3 rounded-xl border border-[#E5E9F2] dark:border-slate-800 text-xs font-bold flex items-center justify-between text-[#0B1220] dark:text-white bg-[#F4F6FA] dark:bg-[#101A30] hover:bg-slate-100 transition-colors"
+                className="w-full py-2.5 px-3 rounded-xl border border-border text-xs font-bold flex items-center justify-between text-foreground bg-muted hover:bg-muted/80 transition-colors"
               >
                 <span>Turn-by-Turn Guidance & Fleet Analytics</span>
                 {showAnalyticsDrawer ? (
-                  <ChevronUp className="h-4 w-4 text-[#14B8A6]" />
+                  <ChevronUp className="h-4 w-4 text-quantum-600 dark:text-quantum-400" />
                 ) : (
                   <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 )}
               </button>
 
               {showAnalyticsDrawer && (
-                <div className="mt-3 p-3.5 rounded-2xl bg-white dark:bg-[#101A30] border border-[#E5E9F2] dark:border-slate-800 space-y-3 transition-all">
+                <div className="mt-3 p-3.5 rounded-2xl bg-card border border-border space-y-3 transition-all">
                   <div className="space-y-1">
                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
                       Turn-by-Turn Guidance
@@ -614,11 +602,11 @@ export default function DashboardPage() {
                     <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                       {selectedRoute.instructions?.map((step, idx) => (
                         <div key={idx} className="flex items-start gap-2 text-xs">
-                          <span className="h-4 w-4 rounded-full bg-slate-100 dark:bg-slate-800 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                          <span className="h-4 w-4 rounded-full bg-muted text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                             {idx + 1}
                           </span>
                           <div className="flex-1">
-                            <p className="text-[#0B1220] dark:text-white font-medium">{step.text}</p>
+                            <p className="text-foreground font-medium">{step.text}</p>
                             <span className="text-[10px] text-muted-foreground">
                               {formatDistance(step.distanceKm)} • {formatDuration(step.durationMin)}
                             </span>
@@ -628,17 +616,17 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-[#E5E9F2] dark:border-slate-800 text-xs space-y-1">
+                  <div className="pt-2 border-t border-border text-xs space-y-1">
                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
                       Powertrain Energy Summary
                     </span>
                     <div className="flex justify-between text-muted-foreground text-[11px]">
                       <span>Estimated Fuel Consumption:</span>
-                      <strong className="text-[#0B1220] dark:text-white">{selectedRoute.energyUsedUnits} units</strong>
+                      <strong className="text-foreground">{selectedRoute.energyUsedUnits} units</strong>
                     </div>
                     <div className="flex justify-between text-muted-foreground text-[11px]">
                       <span>Estimated Carbon Footprint:</span>
-                      <strong className="text-[#0B1220] dark:text-white">{formatEmissions(selectedRoute.emissionsKg)}</strong>
+                      <strong className="text-foreground">{formatEmissions(selectedRoute.emissionsKg)}</strong>
                     </div>
                   </div>
                 </div>
@@ -653,33 +641,33 @@ export default function DashboardPage() {
         {/* Floating Top Journey HUD (Sleek, uncluttered, transparent pill) */}
         {selectedRoute && (
           <div className="absolute top-3 left-3 right-3 md:left-4 md:right-auto z-20 pointer-events-none flex flex-wrap items-center gap-2">
-            <div className="pointer-events-auto bg-white/95 dark:bg-[#0B1220]/95 backdrop-blur-md border border-[#E5E9F2] dark:border-slate-800 shadow-md rounded-xl px-3.5 py-1.5 flex items-center gap-3 text-xs font-semibold">
+            <div className="pointer-events-auto bg-card/95 backdrop-blur-md border border-border shadow-md rounded-xl px-3.5 py-1.5 flex items-center gap-3 text-xs font-semibold">
               <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-[#10B981]" />
-                <span className="font-bold text-[#0B1220] dark:text-white">{selectedRoute.name}</span>
+                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                <span className="font-bold text-foreground">{selectedRoute.name}</span>
               </div>
-              <div className="h-4 w-px bg-[#E5E9F2] dark:bg-slate-800" />
+              <div className="h-4 w-px bg-border" />
               <div className="text-muted-foreground">
-                ETA: <strong className="text-[#0B1220] dark:text-white">{formatDuration(selectedRoute.durationMin)}</strong>
+                ETA: <strong className="text-foreground">{formatDuration(selectedRoute.durationMin)}</strong>
               </div>
-              <div className="h-4 w-px bg-[#E5E9F2] dark:bg-slate-800" />
+              <div className="h-4 w-px bg-border" />
               <div className="text-muted-foreground">
-                Dist: <strong className="text-[#0B1220] dark:text-white">{formatDistance(selectedRoute.distanceKm)}</strong>
+                Dist: <strong className="text-foreground">{formatDistance(selectedRoute.distanceKm)}</strong>
               </div>
-              <div className="h-4 w-px bg-[#E5E9F2] dark:bg-slate-800" />
-              <div className="text-[#14B8A6] font-bold">
+              <div className="h-4 w-px bg-border" />
+              <div className="text-emerald-600 dark:text-emerald-400 font-bold">
                 {formatCurrency(selectedRoute.fuelCostInr)}
               </div>
             </div>
 
             {/* Subtle layer toggles */}
-            <div className="pointer-events-auto flex items-center gap-1 bg-white/95 dark:bg-[#0B1220]/95 backdrop-blur-md border border-[#E5E9F2] dark:border-slate-800 px-2 py-1 rounded-xl shadow-xs text-xs">
+            <div className="pointer-events-auto flex items-center gap-1 bg-card/95 backdrop-blur-md border border-border px-2 py-1 rounded-xl shadow-xs text-xs">
               <button
                 type="button"
                 onClick={() => setShowEVChargers(!showEVChargers)}
                 className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-colors ${
                   showEVChargers
-                    ? 'bg-teal-50 dark:bg-teal-950/40 text-[#14B8A6]'
+                    ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
                 title="Toggle EV Hubs"
@@ -692,7 +680,7 @@ export default function DashboardPage() {
                 onClick={() => setShowTrafficFlow(!showTrafficFlow)}
                 className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-colors ${
                   showTrafficFlow
-                    ? 'bg-teal-50 dark:bg-teal-950/40 text-[#14B8A6]'
+                    ? 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
                 title="Toggle Traffic Flow"
@@ -726,7 +714,7 @@ export default function DashboardPage() {
 
         {/* MOBILE DRAGGABLE BOTTOM ROUTE PANEL */}
         <div
-          className={`md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#0B1220]/95 backdrop-blur-md border-t border-[#E5E9F2] dark:border-slate-800 shadow-2xl rounded-t-3xl transition-all duration-300 ${
+          className={`md:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border shadow-2xl rounded-t-3xl transition-all duration-300 ${
             isMobileSheetExpanded ? 'max-h-[82vh] overflow-y-auto' : 'max-h-36 overflow-hidden'
           }`}
         >
@@ -737,7 +725,7 @@ export default function DashboardPage() {
             className="w-full py-2.5 flex flex-col items-center cursor-pointer group"
             aria-label="Toggle Route Panel"
           >
-            <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700 group-hover:bg-[#14B8A6] transition-colors" />
+            <div className="w-12 h-1.5 rounded-full bg-muted-foreground/30 group-hover:bg-quantum-500 transition-colors" />
             <div className="flex items-center gap-1 text-[11px] font-bold text-muted-foreground mt-1">
               <span>{isMobileSheetExpanded ? 'Collapse Map View' : 'Slide Up for Route Details'}</span>
               {isMobileSheetExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
@@ -750,12 +738,12 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between pb-1">
                 <div>
                   <span className="text-[10px] text-muted-foreground uppercase font-bold">Selected Route</span>
-                  <p className="text-xs font-bold text-[#0B1220] dark:text-white truncate max-w-[200px]">
+                  <p className="text-xs font-bold text-foreground truncate max-w-[200px]">
                     {selectedRoute.name}
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="text-base font-extrabold text-[#14B8A6]">
+                  <span className="text-base font-extrabold text-quantum-600 dark:text-quantum-400">
                     {formatDuration(selectedRoute.durationMin)}
                   </span>
                   <p className="text-[10px] text-muted-foreground">
@@ -772,7 +760,7 @@ export default function DashboardPage() {
 
                 {/* Mobile Route Alternatives */}
                 <div className="space-y-2.5">
-                  <span className="text-xs font-bold text-[#0B1220] dark:text-white block">
+                  <span className="text-xs font-bold text-foreground block">
                     Route Alternatives ({routes.length})
                   </span>
 
@@ -788,18 +776,18 @@ export default function DashboardPage() {
 
                 {/* Mobile Turn-by-Turn Guidance */}
                 {selectedRoute && selectedRoute.instructions?.length > 0 && (
-                  <div className="p-3.5 rounded-2xl bg-[#F4F6FA] dark:bg-[#101A30] border border-[#E5E9F2] dark:border-slate-800 space-y-2">
-                    <span className="text-xs font-bold text-[#0B1220] dark:text-white block">
+                  <div className="p-3.5 rounded-2xl bg-muted border border-border space-y-2">
+                    <span className="text-xs font-bold text-foreground block">
                       Turn-by-Turn Directions
                     </span>
                     <div className="space-y-2 max-h-48 overflow-y-auto">
                       {selectedRoute.instructions.map((step, idx) => (
                         <div key={idx} className="flex items-start gap-2 text-xs">
-                          <span className="h-4 w-4 rounded-full bg-white dark:bg-slate-800 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                          <span className="h-4 w-4 rounded-full bg-card text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                             {idx + 1}
                           </span>
                           <div>
-                            <p className="text-[#0B1220] dark:text-white font-medium">{step.text}</p>
+                            <p className="text-foreground font-medium">{step.text}</p>
                             <span className="text-[10px] text-muted-foreground">
                               {formatDistance(step.distanceKm)} • {formatDuration(step.durationMin)}
                             </span>
