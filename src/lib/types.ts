@@ -146,6 +146,22 @@ export interface TrafficFlowSegment {
   status: 'smooth' | 'moderate' | 'congested' | 'blocked';
 }
 
+export type PlaceCategory = 'hotel' | 'park' | 'cafe' | 'rest_stop';
+
+export interface IntermediatePlace {
+  id: string;
+  name: string;
+  category: PlaceCategory;
+  lat: number;
+  lng: number;
+  address?: string;
+  rating?: number; // e.g. 4.6
+  distanceFromRouteKm?: number; // perpendicular distance off route corridor
+  amenities?: string[];
+  description?: string;
+  isVerified?: boolean;
+}
+
 export interface AirQualityData {
   usAqi: number;
   europeanAqi: number;

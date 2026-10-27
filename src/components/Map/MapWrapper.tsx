@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import React from 'react';
-import { LatLng, RouteAlternative, TrafficIncident, EVChargingStation } from '@/lib/types';
+import { LatLng, RouteAlternative, TrafficIncident, EVChargingStation, IntermediatePlace } from '@/lib/types';
 
 const InteractiveMapInternal = dynamic(() => import('./InteractiveMap'), {
   ssr: false,
@@ -31,6 +31,9 @@ interface MapWrapperProps {
   showChargingStations?: boolean;
   showTrafficFlow?: boolean;
   tomtomTrafficTileUrl?: string;
+  intermediatePlaces?: IntermediatePlace[];
+  showIntermediatePlaces?: boolean;
+  onAddPlaceAsStop?: (place: IntermediatePlace) => void;
 }
 
 export function MapWrapper(props: MapWrapperProps) {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { MapWrapper } from '@/components/Map/MapWrapper';
 import { RouteCard } from '@/components/RouteCard';
@@ -13,6 +13,7 @@ import {
   WeatherCondition,
   AirQualityData,
   EVChargingStation,
+  IntermediatePlace,
 } from '@/lib/types';
 import { saveRoute } from '@/lib/storage';
 import {
@@ -30,6 +31,11 @@ import {
   Sparkles,
   PanelLeftClose,
   PanelLeftOpen,
+  Hotel,
+  Trees,
+  Plus,
+  MapPin,
+  Star,
 } from 'lucide-react';
 import { formatCurrency, formatDistance, formatDuration, formatEmissions } from '@/lib/utils';
 
@@ -76,6 +82,13 @@ function DashboardContent() {
   const [airQuality, setAirQuality] = useState<AirQualityData | null>(null);
   const [chargingStations, setChargingStations] = useState<EVChargingStation[]>([]);
   const [fuelInfo, setFuelInfo] = useState<{ petrol: number; diesel: number; isLive: boolean } | null>(null);
+
+  // Intermediate places along route corridor (Hotels & Parks)
+  const [intermediatePlaces, setIntermediatePlaces] = useState<IntermediatePlace[]>([]);
+  const [showIntermediatePlaces, setShowIntermediatePlaces] = useState(true);
+  const [placeFilter, setPlaceFilter] = useState<'all' | 'hotel' | 'park'>('all');
+  const [isLoadingPlaces, setIsLoadingPlaces] = useState(false);
+  const [showPlacesSection, setShowPlacesSection] = useState(true);
 
   const [isLoadingRoutes, setIsLoadingRoutes] = useState(false);
   const [isSearchingOrigin, setIsSearchingOrigin] = useState(false);
@@ -218,6 +231,7 @@ function DashboardContent() {
         if (data.routes?.length > 0) {
           const rec = data.routes.find((r: RouteAlternative) => r.isRecommended) || data.routes[0];
           setSelectedRouteId(rec.id);
+          fetchPlacesAlongRoute(activeOrigin, activeDest, rec.coordinates || []);
         }
       }
     } catch (e) {
@@ -225,6 +239,80 @@ function DashboardContent() {
     } finally {
       setIsLoadingRoutes(false);
     }
+  };
+
+  const fetchPlacesAlongRoute = async (
+    activeOrigin: LatLng,
+    activeDest: LatLng,
+    coords: [number, number][] = []
+  ) => {
+    setIsLoadingPlaces(true);
+    try {
+      const res = await fetch('/api/places-along-route', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origin: activeOrigin,
+          destination: activeDest,
+          coordinates: coords,
+          category: 'all',
+          maxDistanceKm: 4.5,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setIntermediatePlaces(data.places || []);
+      }
+    } catch (e) {
+      console.error('Failed to fetch intermediate places:', e);
+    } finally {
+      setIsLoadingPlaces(false);
+    }
+  };
+
+  const handleAddPlaceAsStop = (place: IntermediatePlace) => {
+    if (stops.length >= 3) {
+      alert('Maximum of 3 intermediate stops reached. Please remove one before adding another.');
+      return;
+    }
+    if (stops.some((s) => Math.abs(s.lat - place.lat) < 0.001 && Math.abs(s.lng - place.lng) < 0.001)) {
+      return;
+    }
+    const newStop = {
+      id: `stop-${Date.now()}`,
+      lat: place.lat,
+      lng: place.lng,
+      label: place.name,
+      query: place.name,
+      suggestions: [],
+    };
+    const nextStops = [...stops, newStop];
+    setStops(nextStops);
+
+    setIsLoadingRoutes(true);
+    fetch('/api/routes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        origin,
+        destination,
+        stops: nextStops.filter((s) => s.lat && s.lng).map((s) => ({ lat: s.lat, lng: s.lng, label: s.label })),
+        vehicleType,
+        objective,
+        avoidTolls,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setRoutes(data.routes || []);
+        if (data.routes?.length > 0) {
+          const rec = data.routes.find((r: RouteAlternative) => r.isRecommended) || data.routes[0];
+          setSelectedRouteId(rec.id);
+          fetchPlacesAlongRoute(origin, destination, rec.coordinates || []);
+        }
+      })
+      .catch((e) => console.error('Error adding stop and rerouting:', e))
+      .finally(() => setIsLoadingRoutes(false));
   };
 
   const fetchIncidentData = async () => {
@@ -428,6 +516,198 @@ function DashboardContent() {
   };
 
   const selectedRoute = routes.find((r) => r.id === selectedRouteId) || routes[0];
+
+  const filteredPlaces = useMemo(() => {
+    if (placeFilter === 'all') return intermediatePlaces;
+    return intermediatePlaces.filter((p) => p.category === placeFilter);
+  }, [intermediatePlaces, placeFilter]);
+
+  const hotelCount = useMemo(
+    () => intermediatePlaces.filter((p) => p.category === 'hotel').length,
+    [intermediatePlaces]
+  );
+  const parkCount = useMemo(
+    () => intermediatePlaces.filter((p) => p.category === 'park').length,
+    [intermediatePlaces]
+  );
+
+  const renderPlacesSection = () => {
+    return (
+      <div className="pt-2">
+        <button
+          type="button"
+          onClick={() => setShowPlacesSection(!showPlacesSection)}
+          className="w-full py-2.5 px-3 rounded-xl border border-border text-xs font-bold flex items-center justify-between text-foreground bg-muted hover:bg-muted/80 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-sm">🏨🌳</span>
+            <span>Hotels & Parks Along Route</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-primary/10 text-primary font-extrabold">
+              {intermediatePlaces.length}
+            </span>
+          </div>
+          {showPlacesSection ? (
+            <ChevronUp className="h-4 w-4 text-quantum-600 dark:text-quantum-400" />
+          ) : (
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          )}
+        </button>
+
+        {showPlacesSection && (
+          <div className="mt-3 p-3 rounded-2xl bg-card border border-border space-y-3 transition-all">
+            {/* Filter Tabs */}
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-muted border border-border text-xs">
+              <button
+                type="button"
+                onClick={() => setPlaceFilter('all')}
+                className={`flex-1 py-1 rounded-lg text-[11px] font-bold transition-all text-center ${
+                  placeFilter === 'all'
+                    ? 'bg-primary text-primary-foreground shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                All ({intermediatePlaces.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setPlaceFilter('hotel')}
+                className={`flex-1 py-1 rounded-lg text-[11px] font-bold transition-all text-center flex items-center justify-center gap-1 ${
+                  placeFilter === 'hotel'
+                    ? 'bg-purple-600 text-white shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <span>🏨</span>
+                <span>Hotels ({hotelCount})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPlaceFilter('park')}
+                className={`flex-1 py-1 rounded-lg text-[11px] font-bold transition-all text-center flex items-center justify-center gap-1 ${
+                  placeFilter === 'park'
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <span>🌳</span>
+                <span>Parks ({parkCount})</span>
+              </button>
+            </div>
+
+            {/* Loading state */}
+            {isLoadingPlaces && (
+              <div className="space-y-2 py-2">
+                {[1, 2].map((i) => (
+                  <div key={i} className="p-3 rounded-xl border border-border/70 space-y-2">
+                    <div className="h-3 w-28 rounded-md skeleton-shimmer" />
+                    <div className="h-2.5 w-44 rounded-md skeleton-shimmer" />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Empty state */}
+            {!isLoadingPlaces && filteredPlaces.length === 0 && (
+              <div className="p-4 text-center text-xs text-muted-foreground bg-muted/40 rounded-xl border border-dashed border-border">
+                No {placeFilter === 'hotel' ? 'hotels' : placeFilter === 'park' ? 'parks' : 'places'} found within corridor range.
+              </div>
+            )}
+
+            {/* List of Places */}
+            {!isLoadingPlaces && filteredPlaces.length > 0 && (
+              <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                {filteredPlaces.map((place) => {
+                  const isAlreadyStop = stops.some(
+                    (s) => Math.abs(s.lat - place.lat) < 0.001 && Math.abs(s.lng - place.lng) < 0.001
+                  );
+
+                  return (
+                    <div
+                      key={place.id}
+                      className="p-3 rounded-xl border border-border bg-muted/30 hover:bg-muted/60 transition-colors space-y-2 text-xs"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start gap-2 flex-1 min-w-0">
+                          <span
+                            className={`h-7 w-7 rounded-lg text-sm flex items-center justify-center shrink-0 border ${
+                              place.category === 'hotel'
+                                ? 'bg-purple-100 dark:bg-purple-950/60 border-purple-200 dark:border-purple-800'
+                                : place.category === 'park'
+                                ? 'bg-emerald-100 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800'
+                                : 'bg-amber-100 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800'
+                            }`}
+                          >
+                            {place.category === 'hotel' ? '🏨' : place.category === 'park' ? '🌳' : '☕'}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="font-bold text-foreground truncate">{place.name}</span>
+                              {place.rating && (
+                                <span className="text-[10px] font-bold text-amber-500 flex items-center gap-0.5">
+                                  ★ {place.rating.toFixed(1)}
+                                </span>
+                              )}
+                            </div>
+                            {place.address && (
+                              <p className="text-[11px] text-muted-foreground truncate">{place.address}</p>
+                            )}
+                            {place.distanceFromRouteKm !== undefined && (
+                              <span className="text-[10px] text-quantum-600 dark:text-quantum-400 font-semibold block mt-0.5">
+                                📍 {place.distanceFromRouteKm.toFixed(1)} km off corridor
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Add stop button */}
+                        <button
+                          type="button"
+                          onClick={() => handleAddPlaceAsStop(place)}
+                          disabled={isAlreadyStop || stops.length >= 3}
+                          className={`shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1 min-h-[32px] sm:min-h-[28px] ${
+                            isAlreadyStop
+                              ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+                              : 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs active:scale-95'
+                          } disabled:opacity-50`}
+                          title={isAlreadyStop ? 'Already added as a stop' : 'Add as stop to route'}
+                        >
+                          {isAlreadyStop ? (
+                            <>
+                              <Check className="h-3 w-3" />
+                              <span>Added</span>
+                            </>
+                          ) : (
+                            <>
+                              <Plus className="h-3 w-3" />
+                              <span>Stop</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Amenities tags */}
+                      {place.amenities && place.amenities.length > 0 && (
+                        <div className="flex flex-wrap gap-1 pt-1 border-t border-border/40">
+                          {place.amenities.slice(0, 3).map((amenity, aIdx) => (
+                            <span
+                              key={aIdx}
+                              className="text-[9px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-medium"
+                            >
+                              {amenity}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Primary input form controls
   const renderRouteInputs = () => (
@@ -713,9 +993,15 @@ function DashboardContent() {
                 key={route.id}
                 route={route}
                 isSelected={route.id === selectedRouteId}
-                onSelect={() => setSelectedRouteId(route.id)}
+                onSelect={() => {
+                  setSelectedRouteId(route.id);
+                  fetchPlacesAlongRoute(origin, destination, route.coordinates || []);
+                }}
               />
             ))}
+
+          {/* Intermediate Places Along Route (Hotels & Parks) */}
+          {selectedRoute && !isLoadingRoutes && renderPlacesSection()}
 
           {/* Expandable Turn-by-Turn Guidance & Fleet Analytics (Only shown when requested!) */}
           {selectedRoute && !isLoadingRoutes && (
@@ -819,6 +1105,19 @@ function DashboardContent() {
             <div className="pointer-events-auto flex items-center gap-1 bg-card/95 backdrop-blur-md border border-border px-2 py-1 rounded-xl shadow-xs text-xs">
               <button
                 type="button"
+                onClick={() => setShowIntermediatePlaces(!showIntermediatePlaces)}
+                className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-colors ${
+                  showIntermediatePlaces
+                    ? 'bg-purple-500/15 text-purple-700 dark:text-purple-300'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+                title="Toggle Hotels & Parks Along Route"
+              >
+                <span>🏨🌳</span>
+                <span className="hidden sm:inline">Places ({filteredPlaces.length})</span>
+              </button>
+              <button
+                type="button"
                 onClick={() => setShowEVChargers(!showEVChargers)}
                 className={`flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-colors ${
                   showEVChargers
@@ -857,13 +1156,22 @@ function DashboardContent() {
             stops={stops.filter((s) => s.lat && s.lng).map((s) => ({ id: s.id, lat: s.lat, lng: s.lng, label: s.label || s.query }))}
             routes={routes}
             selectedRouteId={selectedRouteId}
-            onSelectRoute={(id) => setSelectedRouteId(id)}
+            onSelectRoute={(id) => {
+              setSelectedRouteId(id);
+              const chosen = routes.find((r) => r.id === id);
+              if (chosen) {
+                fetchPlacesAlongRoute(origin, destination, chosen.coordinates || []);
+              }
+            }}
             incidents={incidents}
             showIncidents={true}
             chargingStations={chargingStations}
             showChargingStations={showEVChargers}
             showTrafficFlow={showTrafficFlow}
             tomtomTrafficTileUrl={tomtomTileUrl}
+            intermediatePlaces={filteredPlaces}
+            showIntermediatePlaces={showIntermediatePlaces}
+            onAddPlaceAsStop={handleAddPlaceAsStop}
           />
         </div>
 
@@ -929,10 +1237,16 @@ function DashboardContent() {
                       key={route.id}
                       route={route}
                       isSelected={route.id === selectedRouteId}
-                      onSelect={() => setSelectedRouteId(route.id)}
+                      onSelect={() => {
+                        setSelectedRouteId(route.id);
+                        fetchPlacesAlongRoute(origin, destination, route.coordinates || []);
+                      }}
                     />
                   ))}
                 </div>
+
+                {/* Intermediate Places Along Route (Hotels & Parks) */}
+                {selectedRoute && !isLoadingRoutes && renderPlacesSection()}
 
                 {/* Mobile Turn-by-Turn Guidance */}
                 {selectedRoute && selectedRoute.instructions?.length > 0 && (

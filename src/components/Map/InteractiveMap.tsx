@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { LatLng, RouteAlternative, TrafficIncident, EVChargingStation } from '@/lib/types';
+import { LatLng, RouteAlternative, TrafficIncident, EVChargingStation, IntermediatePlace } from '@/lib/types';
 import { formatCurrency, formatDistance, formatDuration, cn } from '@/lib/utils';
 import {
   AlertCircle,
@@ -38,6 +38,9 @@ interface InteractiveMapProps {
   showChargingStations?: boolean;
   showTrafficFlow?: boolean;
   tomtomTrafficTileUrl?: string;
+  intermediatePlaces?: IntermediatePlace[];
+  showIntermediatePlaces?: boolean;
+  onAddPlaceAsStop?: (place: IntermediatePlace) => void;
 }
 
 // Smooth bounds fitter when endpoints, waypoints, or route selection changes
@@ -225,6 +228,18 @@ function MapLegendControl() {
                   </span>
                   <span className="text-foreground font-medium">EV Fast Hub</span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full bg-purple-600 text-white font-bold text-[8px] flex items-center justify-center shrink-0">
+                    🏨
+                  </span>
+                  <span className="text-foreground font-medium">Hotel / Stay</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full bg-emerald-600 text-white font-bold text-[8px] flex items-center justify-center shrink-0">
+                    🌳
+                  </span>
+                  <span className="text-foreground font-medium">Park / Recreation</span>
+                </div>
               </div>
             </div>
 
@@ -266,6 +281,9 @@ export default function InteractiveMap({
   showChargingStations = true,
   showTrafficFlow = false,
   tomtomTrafficTileUrl = '',
+  intermediatePlaces = [],
+  showIntermediatePlaces = true,
+  onAddPlaceAsStop,
 }: InteractiveMapProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -348,6 +366,24 @@ export default function InteractiveMap({
       iconAnchor: [11, 11],
     });
   }, []);
+
+  const createPlaceIcon = (category: string) => {
+    const isHotel = category === 'hotel';
+    const isPark = category === 'park';
+    const bg = isHotel ? '#7c3aed' : isPark ? '#059669' : '#0284c7';
+    const iconChar = isHotel ? '🏨' : isPark ? '🌳' : '☕';
+    return L.divIcon({
+      className: 'custom-div-icon',
+      html: `
+        <div style="width: 26px; height: 26px; border-radius: 50%; background: ${bg}; border: 2px solid #FFFFFF; box-shadow: 0 2px 7px rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+          <span style="font-size: 12px; line-height: 1;">${iconChar}</span>
+        </div>
+      `,
+      iconSize: [26, 26],
+      iconAnchor: [13, 13],
+      popupAnchor: [0, -10],
+    });
+  };
 
   if (!mounted) {
     return (
@@ -499,6 +535,73 @@ export default function InteractiveMap({
                   </div>
                   <p className="text-xs font-bold text-foreground">{st.title}</p>
                   <p className="text-[11px] text-muted-foreground">{st.address}</p>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+
+        {/* Intermediate Places (Hotels, Parks & Rest Stops Along Route) */}
+        {showIntermediatePlaces &&
+          intermediatePlaces.map((place) => (
+            <Marker
+              key={place.id}
+              position={[place.lat, place.lng]}
+              icon={createPlaceIcon(place.category)}
+            >
+              <Popup>
+                <div className="p-2 max-w-[240px] sm:max-w-xs space-y-1.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <span
+                      className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                        place.category === 'hotel'
+                          ? 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300'
+                          : place.category === 'park'
+                          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                          : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                      }`}
+                    >
+                      {place.category === 'hotel'
+                        ? '🏨 Hotel / Stay'
+                        : place.category === 'park'
+                        ? '🌳 Park / Recreation'
+                        : '☕ Rest Stop'}
+                    </span>
+                    {place.rating && (
+                      <span className="text-[11px] font-bold text-amber-500 flex items-center gap-0.5">
+                        ★ {place.rating.toFixed(1)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs font-bold text-foreground leading-snug">{place.name}</p>
+                  {place.address && (
+                    <p className="text-[11px] text-muted-foreground leading-snug">{place.address}</p>
+                  )}
+                  {place.distanceFromRouteKm !== undefined && (
+                    <p className="text-[10px] text-quantum-600 dark:text-quantum-400 font-semibold">
+                      📍 {place.distanceFromRouteKm.toFixed(1)} km off route corridor
+                    </p>
+                  )}
+                  {place.amenities && place.amenities.length > 0 && (
+                    <div className="flex flex-wrap gap-1 pt-0.5">
+                      {place.amenities.slice(0, 3).map((a, i) => (
+                        <span key={i} className="text-[9px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-medium">
+                          {a}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {onAddPlaceAsStop && (
+                    <div className="pt-1.5">
+                      <button
+                        type="button"
+                        onClick={() => onAddPlaceAsStop(place)}
+                        className="w-full py-1.5 px-2 rounded-lg text-[11px] font-bold bg-primary text-primary-foreground hover:bg-primary/90 transition-all flex items-center justify-center gap-1 shadow-xs active:scale-95"
+                      >
+                        <Plus className="h-3 w-3" />
+                        <span>Add as Waypoint Stop</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </Popup>
             </Marker>
