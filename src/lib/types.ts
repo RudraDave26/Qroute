@@ -188,3 +188,159 @@ export interface EVChargingStation {
   distanceKm?: number;
   dataSource: 'OpenChargeMap API' | 'Verified National EV Registry';
 }
+
+// =========================================================================
+// FLEET & MULTI-VEHICLE CAPACITATED ROUTING (MC-VRPTW-P) TYPES
+// =========================================================================
+
+export type VehicleCapability = 'standard' | 'refrigerated' | 'express' | 'heavy';
+
+export interface FleetVehicle {
+  id: string;
+  name: string;
+  type: VehicleType; // 'ev' | 'petrol' | 'diesel' | 'cng'
+  capacityKg: number; // e.g. 500, 800, 1200
+  capabilities: VehicleCapability[]; // e.g. ['standard', 'refrigerated']
+  driverHourlyWageInr: number; // e.g. ₹180 / hr
+  maintenanceCostPerKmInr: number; // e.g. ₹3.50 / km
+  startLocation: LatLng; // Starting depot
+  endLocation?: LatLng; // Optional return depot (defaults to startLocation)
+  maxShiftDurationMin: number; // e.g. 480 min (8 hours)
+  colorHex?: string;
+  isActive: boolean;
+  isAvailable: boolean;
+}
+
+export interface DeliveryStop {
+  id: string;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  demandKg: number; // weight or parcel count
+  requiredCapability?: VehicleCapability; // e.g. 'refrigerated' for cold-chain medicines/groceries
+  earliestArrivalMin: number; // e.g. 60 (01:00 hour from shift start)
+  latestArrivalMin: number; // e.g. 180 (03:00 hours from shift start)
+  serviceDurationMin: number; // e.g. 8 min unloading time
+  priority: 'normal' | 'urgent' | 'express';
+  isDelivered?: boolean;
+}
+
+export interface FleetConstraintViolation {
+  vehicleId: string;
+  stopId?: string;
+  type: 'capacity_exceeded' | 'time_window_lateness' | 'capability_mismatch' | 'shift_overtime';
+  description: string;
+  magnitude: number; // e.g. 45 kg over, or 22 min late
+  penaltyCostInr: number;
+}
+
+export interface FleetVehicleTour {
+  vehicleId: string;
+  vehicleName: string;
+  vehicleType: VehicleType;
+  stops: DeliveryStop[];
+  totalDistanceKm: number;
+  totalDurationMin: number;
+  travelTimeMin: number;
+  serviceTimeMin: number;
+  fuelCostInr: number;
+  energyUsedUnits: number; // Liters or kWh
+  emissionsKg: number;
+  driverCostInr: number;
+  maintenanceCostInr: number;
+  tollCostInr: number;
+  operatingCostInr: number; // sum of fuel + driver + maintenance + tolls
+  totalPayloadKg: number;
+  capacityUtilizationPercent: number;
+  pathCoordinates: [number, number][]; // Full driving geometry
+  violations: FleetConstraintViolation[];
+  isFeasible: boolean;
+}
+
+export interface FleetVrpProblem {
+  id: string;
+  title: string;
+  depot: LatLng;
+  vehicles: FleetVehicle[];
+  stops: DeliveryStop[];
+  timeHorizonMin: number; // e.g. 480 min
+  objectiveWeights: FleetObjectiveWeights;
+}
+
+export interface FleetObjectiveWeights {
+  costWeight: number; // w_c ∈ [0, 1]
+  timeWeight: number; // w_t ∈ [0, 1]
+  emissionsWeight: number; // w_e ∈ [0, 1]
+}
+
+export interface FleetVrpSolution {
+  problemId: string;
+  algorithmId: 'qiga-fleet' | 'cga-fleet' | 'clarke-wright' | 'nearest-neighbor';
+  algorithmName: string;
+  tours: FleetVehicleTour[];
+  totalOperatingCostInr: number;
+  totalDistanceKm: number;
+  totalDurationMin: number;
+  totalEmissionsKg: number;
+  totalPayloadDeliveredKg: number;
+  unassignedStops: DeliveryStop[];
+  violations: FleetConstraintViolation[];
+  isFeasible: boolean;
+  executionTimeMs: number;
+  objectiveScore: number;
+  convergenceTrajectory?: { generation: number; bestScore: number; avgScore: number; diversity: number }[];
+  explanationSummary?: string;
+}
+
+export type DynamicEventType = 'vehicle_breakdown' | 'rush_order_injection' | 'traffic_gridlock';
+
+export interface DynamicReoptEvent {
+  id: string;
+  type: DynamicEventType;
+  timestampMin: number;
+  targetVehicleId?: string;
+  newStops?: DeliveryStop[];
+  delayMinutes?: number;
+  corridorDescription?: string;
+}
+
+export interface DynamicReoptResult {
+  event: DynamicReoptEvent;
+  priorSolution: FleetVrpSolution;
+  reoptimizedSolution: FleetVrpSolution;
+  computeTimeMs: number;
+  costDeltaInr: number;
+  durationDeltaMin: number;
+  emissionsDeltaKg: number;
+  affectedVehicleIds: string[];
+  reassignedStopIds: string[];
+  explanation: string;
+}
+
+export interface FleetBenchmarkRun {
+  runIndex: number;
+  algorithmId: string;
+  executionTimeMs: number;
+  totalOperatingCostInr: number;
+  totalDistanceKm: number;
+  totalDurationMin: number;
+  totalEmissionsKg: number;
+  isFeasible: boolean;
+  objectiveScore: number;
+}
+
+export interface FleetExplainabilityReport {
+  selectedAlgorithm: string;
+  primarySelectionReason: string;
+  costBreakdownExplanation: string;
+  multiObjectiveTradeoffExplanation: string;
+  constraintSatisfactionProof: string;
+  alternativeComparisons: {
+    comparisonAlgorithm: string;
+    costDifferenceInr: number;
+    timeDifferenceMin: number;
+    emissionsDifferenceKg: number;
+    advantageExplanation: string;
+  }[];
+}
