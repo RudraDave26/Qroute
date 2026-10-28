@@ -19,6 +19,7 @@ import {
   Atom,
   Sparkles,
   ChevronDown,
+  Truck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -78,14 +79,15 @@ export function Navbar() {
 
   // Primary navigation links always accessible on desktop/tablet header
   const primaryNavLinks: NavLinkItem[] = [
-    { href: '/dashboard', label: 'Dashboard', icon: Navigation },
-    { href: '/plan', label: 'Route Planner', icon: Sliders },
+    { href: '/dashboard', label: 'Route Navigation', icon: Navigation },
+    { href: '/fleet', label: 'Fleet Optimization', icon: Truck, isHighlight: true },
+    { href: '/lab', label: 'Optimization Lab', icon: Cpu },
     { href: '/traffic', label: 'Live Traffic', icon: Radio },
-    { href: '/lab', label: 'Optimization Lab', icon: Cpu, isHighlight: true },
   ];
 
   // Secondary navigation links housed inside the elegant "More" menu on compact desktop
   const secondaryNavLinks: NavLinkItem[] = [
+    { href: '/plan', label: 'Powertrain Cost Lab', description: 'Vehicle efficiency & tariffs', icon: Sliders },
     { href: '/features', label: 'Features', description: 'Interactive platform capabilities', icon: Sparkles },
     { href: '/analytics', label: 'Analytics', description: 'Network KPIs & corridor heatmaps', icon: BarChart3 },
     { href: '/saved', label: 'Saved Routes', description: 'Stored itineraries & commutes', icon: Bookmark },
@@ -94,14 +96,15 @@ export function Navbar() {
 
   // All navigation links combined for wide screens and mobile drawer
   const allNavLinks: NavLinkItem[] = [
-    primaryNavLinks[0], // Dashboard
-    secondaryNavLinks[0], // Features
-    primaryNavLinks[1], // Route Planner
-    primaryNavLinks[2], // Live Traffic
-    primaryNavLinks[3], // Optimization Lab
-    secondaryNavLinks[1], // Analytics
-    secondaryNavLinks[2], // Saved Routes
-    secondaryNavLinks[3], // About
+    primaryNavLinks[0], // Route Navigation
+    primaryNavLinks[1], // Fleet Optimization
+    secondaryNavLinks[0], // Powertrain Cost Lab
+    primaryNavLinks[2], // Optimization Lab
+    primaryNavLinks[3], // Live Traffic
+    secondaryNavLinks[1], // Features
+    secondaryNavLinks[2], // Analytics
+    secondaryNavLinks[3], // Saved Routes
+    secondaryNavLinks[4], // About
   ];
 
   const isSecondaryActive = secondaryNavLinks.some((item) => pathname === item.href);
